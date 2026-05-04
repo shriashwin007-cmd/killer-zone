@@ -12,25 +12,24 @@ body{
   margin:0;
   background:#000;
   color:#fff;
-  font-family:Poppins;
+  font-family:'Poppins',sans-serif;
 }
 
-/* NAV */
 nav{
   position:fixed;
   width:100%;
-  background:rgba(0,0,0,0.8);
+  background:rgba(0,0,0,.85);
   backdrop-filter:blur(10px);
   padding:15px;
   z-index:999;
 }
+
 nav h1{
-  font-family:Orbitron;
+  font-family:'Orbitron';
   color:#8a2be2;
-  text-shadow:0 0 20px #8a2be2;
+  text-shadow:0 0 20px #8a2be2,0 0 40px #00f7ff;
 }
 
-/* HERO */
 .hero{
   height:100vh;
   display:flex;
@@ -42,18 +41,18 @@ nav h1{
 
 .hero h2{
   font-size:3rem;
-  font-family:Orbitron;
+  font-family:'Orbitron';
   background:linear-gradient(90deg,#00f7ff,#8a2be2);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
 }
 
 .hero img{
-  width:80%;
+  width:85%;
   max-width:900px;
-  border-radius:20px;
   margin-top:30px;
-  box-shadow:0 0 40px rgba(138,43,226,0.4);
+  border-radius:20px;
+  box-shadow:0 0 40px rgba(138,43,226,.4);
   transition:0.4s;
 }
 
@@ -61,23 +60,21 @@ nav h1{
   transform:scale(1.05);
 }
 
-/* SECTION */
 section{
   padding:80px 20px;
   text-align:center;
 }
 
 h3{
-  font-family:Orbitron;
+  font-family:'Orbitron';
   font-size:2rem;
-  margin-bottom:20px;
 }
 
-/* GALLERY */
 .gallery{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
   gap:15px;
+  margin-top:30px;
 }
 
 .gallery img{
@@ -90,19 +87,17 @@ h3{
   transform:scale(1.07);
 }
 
-/* BUTTON */
 .btn{
   background:linear-gradient(90deg,#00f7ff,#8a2be2);
   padding:12px 25px;
   border-radius:50px;
   text-decoration:none;
   color:#000;
-  font-weight:bold;
+  font-weight:700;
   display:inline-block;
   margin-top:20px;
 }
 
-/* FOOTER */
 footer{
   padding:30px;
   text-align:center;
@@ -113,29 +108,24 @@ footer{
 
 <body>
 
-<!-- NAV -->
 <nav>
   <h1>KILLER ZONE 🎮</h1>
 </nav>
 
-<!-- HERO -->
 <div class="hero">
   <h2>Step Into Gaming Heaven</h2>
-  <p>Premium PS5 Gaming Experience in Chennai</p>
+  <p>Experience Premium PS5 Gaming in Killer Zone</p>
 
-  <!-- MAIN IMAGE -->
-  <img src="killer zone showroom pic.jpeg" alt="Killer Zone Setup">
+  <img src="killer zone showroom pic.jpeg">
 
   <a href="https://wa.me/917358546431?text=Hi%20Killer%20Zone!" class="btn">Book Now</a>
 </div>
 
-<!-- EXPERIENCE -->
 <section>
   <h3>🔥 What We Offer</h3>
-  <p>PS5 Gaming • Multiplayer • Premium Setup • AC Comfort</p>
+  <p>PS5 Gaming • Multiplayer • RGB Setup • AC Comfort</p>
 </section>
 
-<!-- GALLERY -->
 <section>
   <h3>🎮 Our Gaming Setup</h3>
 
@@ -148,7 +138,6 @@ footer{
   </div>
 </section>
 
-<!-- LOCATION -->
 <section>
   <h3>📍 Location</h3>
   <p>
@@ -160,7 +149,6 @@ footer{
   <a href="tel:+917358546431" class="btn">Call Now</a>
 </section>
 
-<!-- FOOTER -->
 <footer>
   <p>© 2026 Killer Zone Gaming</p>
 </footer>
