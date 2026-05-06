@@ -336,6 +336,28 @@ footer{border-top:1px solid rgba(255,255,255,.08);padding:4.5rem 1.5rem 2.5rem;p
 </head>
 <body>
 
+<script>
+// router - hash based
+function route(){
+  const hash = window.location.hash;
+  const pub = document.getElementById('public-view');
+  const adm = document.getElementById('admin-view');
+  if(hash === '#admin'){
+    pub.style.display = 'none';
+    adm.style.display = 'block';
+    document.title = 'Killer Zone — Admin Panel';
+  }else{
+    adm.style.display = 'none';
+    pub.style.display = 'block';
+    document.title = 'Killer Zone – Luxury Gaming Lounge';
+  }
+}
+window.addEventListener('hashchange', route);
+window.addEventListener('DOMContentLoaded', route);
+</script>
+
+<div id="public-view">
+
 <!-- CURSOR -->
 <div id="cursor"></div>
 <div id="cursor-ring"></div>
@@ -1330,5 +1352,915 @@ window.addEventListener('storage',e=>{
   }
 });
 </script>
+</div>
+<div id="admin-view" style="display:none">
+
+<!-- ════════════ LOGIN ════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="killer_games_logo.jpeg" alt="Killer Zone" />
+    </div>
+    <div class="login-title">ADMIN ACCESS</div>
+    <div class="login-sub">Killer Zone · Luxury Gaming Lounge</div>
+    <input id="login-pwd" class="login-input" type="password" placeholder="Enter password" autofocus />
+    <button id="login-btn" class="login-btn">Unlock Panel →</button>
+    <div id="login-error" class="login-error">Wrong password. Try again.</div>
+    <div class="login-hint">// default: <span style="color:var(--cyan)">killerzone</span> — change in Settings</div>
+  </div>
+</div>
+
+<!-- ════════════ APP ════════════ -->
+<div id="app">
+
+  <aside id="sidebar">
+    <div class="brand">
+      <img src="killer_games_logo.jpeg" alt="" />
+      <div>
+        <div class="brand-name">KILLER ZONE</div>
+        <div class="brand-sub">ADMIN · v1.0</div>
+      </div>
+    </div>
+
+    <nav class="side">
+      <button class="nav-item active" data-tab="dashboard"><span class="ico">📊</span> Dashboard</button>
+      <button class="nav-item" data-tab="bookings"><span class="ico">📅</span> Bookings <span class="badge" id="nav-pending">0</span></button>
+      <button class="nav-item" data-tab="pricing"><span class="ico">💰</span> Pricing</button>
+      <button class="nav-item" data-tab="reviews"><span class="ico">⭐</span> Reviews</button>
+      <button class="nav-item" data-tab="settings"><span class="ico">⚙️</span> Settings</button>
+    </nav>
+
+    <div class="side-footer">
+      <a href="index.html" target="_blank" class="side-link">↗ View Public Site</a>
+      <button class="logout-btn" id="logout-btn">🚪 Logout</button>
+    </div>
+  </aside>
+
+  <main>
+    <!-- mobile menu trigger -->
+    <button class="mobile-hamburger" id="mob-toggle" style="margin-bottom:1rem">☰</button>
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div class="tab-page active" id="page-dashboard">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-sub">Overview of your gaming lounge</div>
+        </div>
+        <div class="flex">
+          <a href="index.html" target="_blank" class="btn btn-ghost">↗ View Site</a>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat" style="--accent:rgba(0,247,255,.12)">
+          <div class="lbl">Total Bookings</div>
+          <div class="val" id="stat-total">0</div>
+          <div class="delta">All time</div>
+        </div>
+        <div class="stat" style="--accent:rgba(255,215,107,.12)">
+          <div class="lbl">Pending</div>
+          <div class="val" id="stat-pending" style="background:linear-gradient(90deg,var(--gold),#ff9d3b);-webkit-background-clip:text;-webkit-text-fill-color:transparent">0</div>
+          <div class="delta" style="color:var(--gold)">Awaiting confirmation</div>
+        </div>
+        <div class="stat" style="--accent:rgba(0,255,136,.12)">
+          <div class="lbl">Confirmed</div>
+          <div class="val" id="stat-confirmed" style="background:linear-gradient(90deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent">0</div>
+          <div class="delta">Active sessions</div>
+        </div>
+        <div class="stat" style="--accent:rgba(138,43,226,.15)">
+          <div class="lbl">This Week</div>
+          <div class="val" id="stat-week">0</div>
+          <div class="delta">New requests</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ico">🕐</span> Recent Bookings</h3>
+        <div id="recent-bookings"></div>
+      </div>
+    </div>
+
+    <!-- ═══ BOOKINGS ═══ -->
+    <div class="tab-page" id="page-bookings">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Bookings</div>
+          <div class="page-sub">Manage every booking request from the website</div>
+        </div>
+        <div class="flex">
+          <button class="btn btn-ghost" onclick="exportCSV()">⬇️ Export CSV</button>
+          <button class="btn btn-danger" onclick="confirmClear('bookings')">🗑️ Clear All</button>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <button class="filter-chip active" data-filter="all">All <span class="count" id="cnt-all">0</span></button>
+        <button class="filter-chip" data-filter="pending">Pending <span class="count" id="cnt-pending">0</span></button>
+        <button class="filter-chip" data-filter="confirmed">Confirmed <span class="count" id="cnt-confirmed">0</span></button>
+        <button class="filter-chip" data-filter="completed">Completed <span class="count" id="cnt-completed">0</span></button>
+        <button class="filter-chip" data-filter="declined">Declined <span class="count" id="cnt-declined">0</span></button>
+        <input class="search-box" id="bk-search" placeholder="🔍 Search by name, phone, room..." />
+      </div>
+
+      <div id="bookings-container"></div>
+    </div>
+
+    <!-- ═══ PRICING ═══ -->
+    <div class="tab-page" id="page-pricing">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Pricing Plans</div>
+          <div class="page-sub">Edit each plan — changes save automatically and reflect on the live site</div>
+        </div>
+        <button class="btn btn-ghost" onclick="resetPricing()">↺ Reset to defaults</button>
+      </div>
+
+      <div id="pricing-editor"></div>
+    </div>
+
+    <!-- ═══ REVIEWS ═══ -->
+    <div class="tab-page" id="page-reviews">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Reviews</div>
+          <div class="page-sub">Add real customer reviews to display on the site</div>
+        </div>
+        <button class="btn btn-primary" onclick="openReviewModal()">+ Add Review</button>
+      </div>
+
+      <div id="reviews-list"></div>
+    </div>
+
+    <!-- ═══ SETTINGS ═══ -->
+    <div class="tab-page" id="page-settings">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Settings</div>
+          <div class="page-sub">Update business info — these reflect on the live site immediately</div>
+        </div>
+        <button class="btn btn-primary" onclick="saveSettings()">💾 Save Changes</button>
+      </div>
+
+      <div class="card" style="margin-bottom:1.2rem">
+        <h3><span class="ico">🏢</span> Business Info</h3>
+        <div class="field-grid">
+          <div class="field">
+            <label>Business Name</label>
+            <input id="set-name" type="text" />
+          </div>
+          <div class="field">
+            <label>Tagline</label>
+            <input id="set-tagline" type="text" />
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <label>Phone (Display)</label>
+            <input id="set-phone" type="text" placeholder="+91 XXXXX XXXXX" />
+          </div>
+          <div class="field">
+            <label>Phone (Raw — digits only, with country code)</label>
+            <input id="set-phone-raw" type="text" placeholder="91XXXXXXXXXX" />
+          </div>
+        </div>
+        <div class="field">
+          <label>WhatsApp Number (digits only with country code)</label>
+          <input id="set-wa" type="text" placeholder="91XXXXXXXXXX" />
+        </div>
+        <div class="field">
+          <label>Address (full)</label>
+          <textarea id="set-addr"></textarea>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <label>Hours</label>
+            <input id="set-hours" type="text" />
+          </div>
+          <div class="field">
+            <label>Status Badge (shown in hero)</label>
+            <input id="set-status" type="text" />
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <label>Google Rating</label>
+            <input id="set-rating" type="number" step="0.1" min="0" max="5" />
+          </div>
+          <div class="field">
+            <label>Review Count</label>
+            <input id="set-review-count" type="number" min="0" />
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.2rem">
+        <h3><span class="ico">🗺️</span> Maps</h3>
+        <div class="field">
+          <label>Map URL (for "Get Directions" button)</label>
+          <input id="set-map-url" type="url" placeholder="https://maps.google.com/?q=..." />
+        </div>
+        <div class="field">
+          <label>Map Embed Source URL <span class="muted">(from Google Maps → Share → Embed → src)</span></label>
+          <textarea id="set-map-embed" rows="3" style="font-family:'JetBrains Mono',monospace;font-size:.78rem"></textarea>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.2rem">
+        <h3><span class="ico">🔐</span> Security</h3>
+        <div class="field-grid">
+          <div class="field">
+            <label>Current Password</label>
+            <input id="set-pwd-old" type="password" placeholder="Current password" />
+          </div>
+          <div class="field">
+            <label>New Password</label>
+            <input id="set-pwd-new" type="password" placeholder="New password (min 6 chars)" />
+          </div>
+        </div>
+        <button class="btn btn-ghost" onclick="changePassword()">🔑 Change Password</button>
+      </div>
+
+      <div class="card">
+        <h3><span class="ico">💾</span> Backup &amp; Restore</h3>
+        <div class="flex" style="margin-bottom:1rem">
+          <button class="btn btn-ghost" onclick="exportAll()">⬇️ Export Everything (JSON)</button>
+          <label class="btn btn-ghost" style="cursor:pointer">
+            ⬆️ Import Backup
+            <input type="file" accept="application/json" style="display:none" onchange="importAll(event)" />
+          </label>
+        </div>
+        <button class="btn btn-danger" onclick="confirmClear('all')">⚠️ Reset Everything to Defaults</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- REVIEW MODAL -->
+<div class="modal" id="review-modal">
+  <div class="modal-card">
+    <h3 id="rm-title">Add Review</h3>
+    <div class="modal-sub">Enter the customer's review exactly as you want it shown.</div>
+    <input type="hidden" id="rm-idx" value="-1" />
+    <div class="field">
+      <label>Customer Name</label>
+      <input id="rm-name" type="text" placeholder="e.g. Karthik R." />
+    </div>
+    <div class="field">
+      <label>Review Text</label>
+      <textarea id="rm-text" rows="4" placeholder="What they said..."></textarea>
+    </div>
+    <div class="field-grid">
+      <div class="field">
+        <label>Stars (1–5)</label>
+        <select id="rm-stars">
+          <option value="5">★★★★★ (5)</option>
+          <option value="4">★★★★☆ (4)</option>
+          <option value="3">★★★☆☆ (3)</option>
+          <option value="2">★★☆☆☆ (2)</option>
+          <option value="1">★☆☆☆☆ (1)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Card Color</label>
+        <select id="rm-color">
+          <option value="cyan">Cyan</option>
+          <option value="purple">Purple</option>
+          <option value="pink">Pink</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Source (label)</label>
+      <input id="rm-src" type="text" placeholder="e.g. Google Review, Instagram, Walk-in" value="Google Review" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeReviewModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveReview()">Save Review</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal" id="confirm-modal">
+  <div class="modal-card">
+    <h3 id="cm-title">Confirm action</h3>
+    <div class="modal-sub" id="cm-sub">Are you sure?</div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger" id="cm-ok">Yes, do it</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   SAME DEFAULTS AS index.html — single source of truth would
+   be cleaner, but inline keeps single-file deploy.
+   ═══════════════════════════════════════════════════════════ */
+const DEFAULT_CONFIG = {
+  business: {
+    name: 'Killer Zone',
+    tagline: 'Luxury Gaming Lounge',
+    phone: '+91 73585 46431',
+    phoneRaw: '917358546431',
+    whatsapp: '917358546431',
+    address: 'Killer Zone Gaming, Chennai, Tamil Nadu, India',
+    hours: 'Open Daily · 11:00 AM – 12:00 AM',
+    statusBadge: 'Now Open · Closes 12:00 AM',
+    mapUrl: 'https://maps.google.com/?q=Killer+Zone+Gaming+Chennai',
+    mapEmbed: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3886.5!2d80.2182!3d13.0679!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5265ea4f7d3361%3A0x6e61a70b6863d433!2sNelson%20Manickam%20Rd%2C%20Chennai%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1710000000000',
+    rating: 5.0,
+    reviewCount: 152,
+  },
+  pricing: [
+    {icon:'⏱️',tag:'Flexible',title:'Per Hour',amount:'Ask In-Store',note:'Best for solo players',features:['PS5 access','Any game title','Themed room','AC comfort'],btn:'Enquire Now',featured:false},
+    {icon:'👥',tag:'Best for Friends',title:'Group Offer',amount:'Special Rate',note:'3+ players together',features:['Any room','Extended session','Priority setup','Snack combo','Group discount'],btn:'Enquire Now',featured:true,badge:'🔥 Most Popular'},
+    {icon:'🌙',tag:'Best Value',title:'Night Deal',amount:'Ask Staff',note:'Late-night sessions',features:['PS5 full access','Quiet atmosphere','Low rush hours','Extended playtime'],btn:'Enquire Now',featured:false}
+  ],
+  reviews: [
+    {stars:5,text:'The themed rooms are unreal. Forza room felt like stepping into Tokyo. Best gaming lounge in Chennai!',name:'Karthik R.',src:'Google Review',color:'cyan'},
+    {stars:5,text:'Booked the Spider-Verse room for my brother\'s birthday — he was floored. Amazing setup, smooth PS5, friendly staff.',name:'Priya S.',src:'Google Review',color:'purple'},
+    {stars:5,text:'Worth every rupee. AC, neon lights, surround sound, and they bring snacks to your room. Already booked again.',name:'Arjun M.',src:'Google Review',color:'pink'},
+  ]
+};
+
+/* ═══════════════════════ STATE ═══════════════════════ */
+let CONFIG = loadConfig();
+let BOOKINGS = loadBookings();
+let currentFilter = 'all';
+let searchTerm = '';
+
+function loadConfig(){
+  try{
+    const saved = JSON.parse(localStorage.getItem('killerzone_config') || 'null');
+    if(!saved) return JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+    return {
+      business: {...DEFAULT_CONFIG.business, ...(saved.business||{})},
+      pricing: saved.pricing || DEFAULT_CONFIG.pricing,
+      reviews: saved.reviews || DEFAULT_CONFIG.reviews,
+    };
+  }catch(e){return JSON.parse(JSON.stringify(DEFAULT_CONFIG))}
+}
+function saveConfig(){
+  localStorage.setItem('killerzone_config', JSON.stringify(CONFIG));
+  // notify other tabs (live site reloads config on storage event)
+  // also dispatch synthetic event for same tab listeners (none here, but harmless)
+}
+function loadBookings(){
+  try{return JSON.parse(localStorage.getItem('killerzone_bookings')||'[]')}catch(e){return []}
+}
+function saveBookings(){
+  localStorage.setItem('killerzone_bookings', JSON.stringify(BOOKINGS));
+}
+
+/* ═══════════════════════ AUTH ═══════════════════════ */
+const PWD_KEY = 'killerzone_admin_pwd';
+const SESSION_KEY = 'killerzone_admin_session';
+const SESSION_TTL = 1000*60*60*8; // 8h session
+
+function getStoredPassword(){
+  return localStorage.getItem(PWD_KEY) || 'killerzone';
+}
+function isLoggedIn(){
+  try{
+    const s = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
+    if(!s) return false;
+    if(Date.now() - s.t > SESSION_TTL) return false;
+    return true;
+  }catch(e){return false}
+}
+function setLoggedIn(){
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({t:Date.now()}));
+}
+function logout(){
+  sessionStorage.removeItem(SESSION_KEY);
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('login-pwd').value='';
+  document.getElementById('login-pwd').focus();
+}
+
+document.getElementById('login-btn').addEventListener('click',()=>{
+  const pwd = document.getElementById('login-pwd').value;
+  if(pwd === getStoredPassword()){
+    setLoggedIn();
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('app').classList.add('show');
+    bootApp();
+  }else{
+    const err = document.getElementById('login-error');
+    err.classList.add('show');
+    setTimeout(()=>err.classList.remove('show'),2400);
+    document.getElementById('login-pwd').value='';
+  }
+});
+document.getElementById('login-pwd').addEventListener('keypress',e=>{
+  if(e.key==='Enter') document.getElementById('login-btn').click();
+});
+document.getElementById('logout-btn').addEventListener('click',logout);
+
+/* ═══════════════════════ TABS ═══════════════════════ */
+document.querySelectorAll('.nav-item').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('page-'+btn.dataset.tab).classList.add('active');
+    if(window.innerWidth<=900) document.getElementById('sidebar').classList.remove('open');
+  });
+});
+document.getElementById('mob-toggle').addEventListener('click',()=>{
+  document.getElementById('sidebar').classList.toggle('open');
+});
+
+/* ═══════════════════════ DASHBOARD ═══════════════════════ */
+function renderDashboard(){
+  const total = BOOKINGS.length;
+  const pending = BOOKINGS.filter(b=>b.status==='pending').length;
+  const confirmed = BOOKINGS.filter(b=>b.status==='confirmed').length;
+  const weekAgo = Date.now() - 7*24*60*60*1000;
+  const week = BOOKINGS.filter(b=>new Date(b.createdAt).getTime() > weekAgo).length;
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-pending').textContent = pending;
+  document.getElementById('stat-confirmed').textContent = confirmed;
+  document.getElementById('stat-week').textContent = week;
+  document.getElementById('nav-pending').textContent = pending;
+  document.getElementById('nav-pending').style.display = pending>0?'inline-block':'none';
+
+  // recent
+  const recent = BOOKINGS.slice(0,5);
+  const container = document.getElementById('recent-bookings');
+  if(recent.length===0){
+    container.innerHTML = `<div class="empty"><div class="em-ico">📭</div><div class="em-title">No bookings yet</div><div class="em-sub">When customers book through the website, they'll appear here.</div></div>`;
+    return;
+  }
+  container.innerHTML = `<div class="table-wrap" style="border:none">${tableHTML(recent)}</div>`;
+}
+
+/* ═══════════════════════ BOOKINGS ═══════════════════════ */
+function tableHTML(list){
+  return `
+    <table>
+      <thead>
+        <tr>
+          <th>When</th>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Room</th>
+          <th>Date · Time</th>
+          <th>Players</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${list.map(b=>`
+          <tr>
+            <td class="mono muted">${formatDate(b.createdAt)}</td>
+            <td><strong>${escapeHtml(b.name)}</strong>${b.notes?`<div class="mono muted" style="margin-top:.25rem;font-size:.75rem">📝 ${escapeHtml(b.notes)}</div>`:''}</td>
+            <td><a href="tel:${b.phone}" class="mono">${escapeHtml(b.phone)}</a></td>
+            <td>${escapeHtml(b.room||'Any')}</td>
+            <td><span class="mono">${escapeHtml(b.date||'—')}</span><br><span class="mono muted">${escapeHtml(b.time||'—')}</span></td>
+            <td class="mono">${escapeHtml(b.people||'—')}</td>
+            <td><span class="status-pill ${b.status}">${b.status}</span></td>
+            <td>
+              <div class="action-btns">
+                ${b.status!=='confirmed'?`<button class="icon-btn success" onclick="setStatus('${b.id}','confirmed')" title="Confirm">✓</button>`:''}
+                ${b.status!=='completed'?`<button class="icon-btn" onclick="setStatus('${b.id}','completed')" title="Mark complete">✔︎</button>`:''}
+                ${b.status!=='declined'?`<button class="icon-btn danger" onclick="setStatus('${b.id}','declined')" title="Decline">✕</button>`:''}
+                ${b.status!=='pending'?`<button class="icon-btn" onclick="setStatus('${b.id}','pending')" title="Mark pending">↺</button>`:''}
+                <a class="icon-btn" href="https://wa.me/${cleanPhone(b.phone)}?text=Hi%20${encodeURIComponent(b.name)}%2C%20your%20booking%20at%20Killer%20Zone%20on%20${encodeURIComponent(b.date||'')}%20at%20${encodeURIComponent(b.time||'')}%20is%20confirmed!" target="_blank" title="WhatsApp">💬</a>
+                <button class="icon-btn danger" onclick="deleteBooking('${b.id}')" title="Delete">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderBookings(){
+  const counts = {
+    all: BOOKINGS.length,
+    pending: BOOKINGS.filter(b=>b.status==='pending').length,
+    confirmed: BOOKINGS.filter(b=>b.status==='confirmed').length,
+    completed: BOOKINGS.filter(b=>b.status==='completed').length,
+    declined: BOOKINGS.filter(b=>b.status==='declined').length,
+  };
+  Object.keys(counts).forEach(k=>{
+    const el = document.getElementById('cnt-'+k);
+    if(el) el.textContent = counts[k];
+  });
+
+  let list = BOOKINGS;
+  if(currentFilter !== 'all') list = list.filter(b=>b.status===currentFilter);
+  if(searchTerm){
+    const s = searchTerm.toLowerCase();
+    list = list.filter(b=>
+      (b.name||'').toLowerCase().includes(s) ||
+      (b.phone||'').toLowerCase().includes(s) ||
+      (b.room||'').toLowerCase().includes(s) ||
+      (b.notes||'').toLowerCase().includes(s)
+    );
+  }
+
+  const container = document.getElementById('bookings-container');
+  if(list.length===0){
+    container.innerHTML = `<div class="empty"><div class="em-ico">📭</div><div class="em-title">${BOOKINGS.length===0?'No bookings yet':'No matches'}</div><div class="em-sub">${BOOKINGS.length===0?'Bookings from the website will show up here.':'Try a different filter or search term.'}</div></div>`;
+    return;
+  }
+  container.innerHTML = `<div class="table-wrap">${tableHTML(list)}</div>`;
+}
+
+document.querySelectorAll('.filter-chip').forEach(chip=>{
+  chip.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    currentFilter = chip.dataset.filter;
+    renderBookings();
+  });
+});
+document.getElementById('bk-search').addEventListener('input',e=>{
+  searchTerm = e.target.value;
+  renderBookings();
+});
+
+function setStatus(id, status){
+  const b = BOOKINGS.find(x=>x.id===id);
+  if(!b) return;
+  b.status = status;
+  saveBookings();
+  renderBookings();
+  renderDashboard();
+  toast(`Marked as ${status}`,'success');
+}
+function deleteBooking(id){
+  showConfirm('Delete this booking?', 'This cannot be undone.', ()=>{
+    BOOKINGS = BOOKINGS.filter(b=>b.id!==id);
+    saveBookings();
+    renderBookings();
+    renderDashboard();
+    toast('Booking deleted','success');
+  });
+}
+
+function exportCSV(){
+  if(BOOKINGS.length===0){toast('No bookings to export','error');return}
+  const headers = ['Created','Name','Phone','Room','Date','Time','Players','Status','Notes'];
+  const rows = BOOKINGS.map(b=>[
+    formatDate(b.createdAt),
+    b.name||'', b.phone||'', b.room||'', b.date||'', b.time||'', b.people||'', b.status||'', (b.notes||'').replace(/[\r\n]+/g,' ')
+  ]);
+  const csv = [headers, ...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  download('killerzone-bookings-'+new Date().toISOString().slice(0,10)+'.csv', csv, 'text/csv');
+  toast('CSV exported','success');
+}
+
+/* ═══════════════════════ PRICING EDITOR ═══════════════════════ */
+function renderPricing(){
+  const ed = document.getElementById('pricing-editor');
+  ed.innerHTML = `<div class="editor-grid">${CONFIG.pricing.map((p,i)=>pricingCardHTML(p,i)).join('')}</div>`;
+  // bind handlers
+  document.querySelectorAll('[data-pi]').forEach(el=>{
+    el.addEventListener('input',()=>{
+      const i = +el.dataset.pi;
+      const k = el.dataset.pk;
+      if(k==='featured') CONFIG.pricing[i][k] = el.checked;
+      else CONFIG.pricing[i][k] = el.value;
+      saveConfig();
+    });
+  });
+}
+function pricingCardHTML(p,i){
+  return `
+    <div class="editor-card ${p.featured?'featured':''}">
+      <h4>${p.icon||'•'} Plan ${i+1}${p.featured?' · ★ FEATURED':''}</h4>
+      <div class="field-grid">
+        <div class="field"><label>Icon (emoji)</label><input data-pi="${i}" data-pk="icon" value="${escapeAttr(p.icon||'')}" /></div>
+        <div class="field"><label>Tag (small)</label><input data-pi="${i}" data-pk="tag" value="${escapeAttr(p.tag||'')}" /></div>
+      </div>
+      <div class="field"><label>Title</label><input data-pi="${i}" data-pk="title" value="${escapeAttr(p.title||'')}" /></div>
+      <div class="field-grid">
+        <div class="field"><label>Amount</label><input data-pi="${i}" data-pk="amount" value="${escapeAttr(p.amount||'')}" /></div>
+        <div class="field"><label>Note</label><input data-pi="${i}" data-pk="note" value="${escapeAttr(p.note||'')}" /></div>
+      </div>
+      <div class="field-grid">
+        <div class="field"><label>Button Text</label><input data-pi="${i}" data-pk="btn" value="${escapeAttr(p.btn||'Enquire Now')}" /></div>
+        <div class="field"><label>Badge (optional, only on featured)</label><input data-pi="${i}" data-pk="badge" value="${escapeAttr(p.badge||'')}" /></div>
+      </div>
+      <div class="field">
+        <label>Featured?</label>
+        <label class="flex" style="font-size:.85rem;color:rgba(255,255,255,.7)"><input type="checkbox" data-pi="${i}" data-pk="featured" ${p.featured?'checked':''} style="margin-right:.5rem;width:auto"> Highlight this plan as the recommended one</label>
+      </div>
+      <div class="field">
+        <label>Features</label>
+        <div class="feature-list" id="feat-list-${i}">
+          ${(p.features||[]).map((f,j)=>`
+            <div class="feature-item">
+              <input value="${escapeAttr(f)}" oninput="updateFeature(${i},${j},this.value)" />
+              <button class="icon-btn danger" onclick="removeFeature(${i},${j})" title="Remove">×</button>
+            </div>
+          `).join('')}
+        </div>
+        <button class="add-feature-btn" onclick="addFeature(${i})">+ Add feature</button>
+      </div>
+    </div>
+  `;
+}
+function updateFeature(i,j,val){
+  CONFIG.pricing[i].features[j] = val;
+  saveConfig();
+}
+function addFeature(i){
+  CONFIG.pricing[i].features = CONFIG.pricing[i].features || [];
+  CONFIG.pricing[i].features.push('New feature');
+  saveConfig();
+  renderPricing();
+}
+function removeFeature(i,j){
+  CONFIG.pricing[i].features.splice(j,1);
+  saveConfig();
+  renderPricing();
+}
+function resetPricing(){
+  showConfirm('Reset pricing to defaults?', 'All your custom pricing edits will be lost.', ()=>{
+    CONFIG.pricing = JSON.parse(JSON.stringify(DEFAULT_CONFIG.pricing));
+    saveConfig();
+    renderPricing();
+    toast('Pricing reset','success');
+  });
+}
+
+/* ═══════════════════════ REVIEWS EDITOR ═══════════════════════ */
+function renderReviewsList(){
+  const list = CONFIG.reviews;
+  const container = document.getElementById('reviews-list');
+  if(list.length===0){
+    container.innerHTML = `<div class="empty"><div class="em-ico">⭐</div><div class="em-title">No reviews yet</div><div class="em-sub">Click "Add Review" to add customer reviews to the public site.</div></div>`;
+    return;
+  }
+  container.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem">
+      ${list.map((r,i)=>`
+        <div class="card" style="border-left:3px solid ${r.color==='purple'?'var(--purple)':r.color==='pink'?'var(--pink)':'var(--cyan)'}">
+          <div class="flex" style="justify-content:space-between;margin-bottom:.6rem">
+            <div style="color:#f6c90e;font-size:1rem">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+            <div class="action-btns">
+              <button class="icon-btn" onclick="editReview(${i})" title="Edit">✎</button>
+              <button class="icon-btn danger" onclick="deleteReview(${i})" title="Delete">🗑️</button>
+            </div>
+          </div>
+          <p style="color:rgba(255,255,255,.8);font-size:.88rem;line-height:1.65;font-style:italic;margin-bottom:1rem">"${escapeHtml(r.text)}"</p>
+          <div class="flex" style="font-size:.82rem">
+            <strong>${escapeHtml(r.name||'Anonymous')}</strong>
+            <span class="muted">· ${escapeHtml(r.src||'Review')}</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+function openReviewModal(){
+  document.getElementById('rm-title').textContent = 'Add Review';
+  document.getElementById('rm-idx').value = '-1';
+  document.getElementById('rm-name').value = '';
+  document.getElementById('rm-text').value = '';
+  document.getElementById('rm-stars').value = '5';
+  document.getElementById('rm-color').value = 'cyan';
+  document.getElementById('rm-src').value = 'Google Review';
+  document.getElementById('review-modal').classList.add('open');
+}
+function editReview(i){
+  const r = CONFIG.reviews[i];
+  document.getElementById('rm-title').textContent = 'Edit Review';
+  document.getElementById('rm-idx').value = String(i);
+  document.getElementById('rm-name').value = r.name||'';
+  document.getElementById('rm-text').value = r.text||'';
+  document.getElementById('rm-stars').value = String(r.stars||5);
+  document.getElementById('rm-color').value = r.color||'cyan';
+  document.getElementById('rm-src').value = r.src||'Google Review';
+  document.getElementById('review-modal').classList.add('open');
+}
+function closeReviewModal(){
+  document.getElementById('review-modal').classList.remove('open');
+}
+function saveReview(){
+  const idx = +document.getElementById('rm-idx').value;
+  const r = {
+    name: document.getElementById('rm-name').value.trim() || 'Customer',
+    text: document.getElementById('rm-text').value.trim(),
+    stars: +document.getElementById('rm-stars').value,
+    color: document.getElementById('rm-color').value,
+    src: document.getElementById('rm-src').value.trim() || 'Review',
+  };
+  if(!r.text){toast('Review text is required','error');return}
+  if(idx>=0) CONFIG.reviews[idx] = r;
+  else CONFIG.reviews.unshift(r);
+  saveConfig();
+  closeReviewModal();
+  renderReviewsList();
+  toast('Review saved','success');
+}
+function deleteReview(i){
+  showConfirm('Delete this review?','It will disappear from the public site.', ()=>{
+    CONFIG.reviews.splice(i,1);
+    saveConfig();
+    renderReviewsList();
+    toast('Review deleted','success');
+  });
+}
+
+/* ═══════════════════════ SETTINGS ═══════════════════════ */
+function renderSettings(){
+  const b = CONFIG.business;
+  document.getElementById('set-name').value = b.name||'';
+  document.getElementById('set-tagline').value = b.tagline||'';
+  document.getElementById('set-phone').value = b.phone||'';
+  document.getElementById('set-phone-raw').value = b.phoneRaw||'';
+  document.getElementById('set-wa').value = b.whatsapp||'';
+  document.getElementById('set-addr').value = b.address||'';
+  document.getElementById('set-hours').value = b.hours||'';
+  document.getElementById('set-status').value = b.statusBadge||'';
+  document.getElementById('set-rating').value = b.rating||5;
+  document.getElementById('set-review-count').value = b.reviewCount||0;
+  document.getElementById('set-map-url').value = b.mapUrl||'';
+  document.getElementById('set-map-embed').value = b.mapEmbed||'';
+}
+function saveSettings(){
+  CONFIG.business = {
+    ...CONFIG.business,
+    name: document.getElementById('set-name').value.trim(),
+    tagline: document.getElementById('set-tagline').value.trim(),
+    phone: document.getElementById('set-phone').value.trim(),
+    phoneRaw: document.getElementById('set-phone-raw').value.replace(/[^0-9]/g,''),
+    whatsapp: document.getElementById('set-wa').value.replace(/[^0-9]/g,''),
+    address: document.getElementById('set-addr').value.trim(),
+    hours: document.getElementById('set-hours').value.trim(),
+    statusBadge: document.getElementById('set-status').value.trim(),
+    rating: parseFloat(document.getElementById('set-rating').value) || 5.0,
+    reviewCount: parseInt(document.getElementById('set-review-count').value) || 0,
+    mapUrl: document.getElementById('set-map-url').value.trim(),
+    mapEmbed: document.getElementById('set-map-embed').value.trim(),
+  };
+  saveConfig();
+  toast('Settings saved · Live site updated','success');
+}
+
+function changePassword(){
+  const oldP = document.getElementById('set-pwd-old').value;
+  const newP = document.getElementById('set-pwd-new').value;
+  if(oldP !== getStoredPassword()){toast('Current password is wrong','error');return}
+  if(newP.length < 6){toast('New password must be at least 6 chars','error');return}
+  localStorage.setItem(PWD_KEY, newP);
+  document.getElementById('set-pwd-old').value='';
+  document.getElementById('set-pwd-new').value='';
+  toast('Password changed','success');
+}
+
+/* ═══════════════════════ BACKUP ═══════════════════════ */
+function exportAll(){
+  const dump = {
+    config: CONFIG,
+    bookings: BOOKINGS,
+    exportedAt: new Date().toISOString(),
+  };
+  download('killerzone-backup-'+new Date().toISOString().slice(0,10)+'.json', JSON.stringify(dump,null,2), 'application/json');
+  toast('Backup exported','success');
+}
+function importAll(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(data.config){
+        CONFIG = {
+          business: {...DEFAULT_CONFIG.business, ...(data.config.business||{})},
+          pricing: data.config.pricing || DEFAULT_CONFIG.pricing,
+          reviews: data.config.reviews || DEFAULT_CONFIG.reviews,
+        };
+        saveConfig();
+      }
+      if(data.bookings && Array.isArray(data.bookings)){
+        BOOKINGS = data.bookings;
+        saveBookings();
+      }
+      toast('Backup restored','success');
+      bootApp();
+    }catch(err){toast('Invalid backup file','error')}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+function confirmClear(what){
+  if(what==='bookings'){
+    showConfirm('Clear ALL bookings?','This deletes every booking permanently. Cannot be undone.', ()=>{
+      BOOKINGS = [];
+      saveBookings();
+      renderBookings();
+      renderDashboard();
+      toast('All bookings cleared','success');
+    });
+  }else{
+    showConfirm('Reset everything?','All settings, pricing, reviews, AND bookings will be wiped.', ()=>{
+      CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+      BOOKINGS = [];
+      localStorage.removeItem('killerzone_config');
+      localStorage.removeItem('killerzone_bookings');
+      toast('Everything reset','success');
+      bootApp();
+    });
+  }
+}
+
+/* ═══════════════════════ HELPERS ═══════════════════════ */
+function formatDate(iso){
+  if(!iso) return '—';
+  try{
+    const d = new Date(iso);
+    const now = new Date();
+    const diff = (now-d)/1000;
+    if(diff<60) return 'just now';
+    if(diff<3600) return Math.floor(diff/60)+'m ago';
+    if(diff<86400) return Math.floor(diff/3600)+'h ago';
+    if(diff<604800) return Math.floor(diff/86400)+'d ago';
+    return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+  }catch(e){return iso}
+}
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function escapeAttr(s){return escapeHtml(s)}
+function cleanPhone(p){return String(p||'').replace(/[^0-9]/g,'')}
+function download(filename, content, mime){
+  const blob = new Blob([content],{type:mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url;a.download=filename;a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),500);
+}
+function toast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = type||'';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+/* CONFIRM modal */
+let confirmCb = null;
+function showConfirm(title, sub, cb){
+  document.getElementById('cm-title').textContent = title;
+  document.getElementById('cm-sub').textContent = sub;
+  confirmCb = cb;
+  document.getElementById('confirm-modal').classList.add('open');
+}
+function closeConfirm(){
+  document.getElementById('confirm-modal').classList.remove('open');
+  confirmCb = null;
+}
+document.getElementById('cm-ok').addEventListener('click',()=>{
+  if(confirmCb) confirmCb();
+  closeConfirm();
+});
+
+/* ═══════════════════════ BOOT ═══════════════════════ */
+function bootApp(){
+  CONFIG = loadConfig();
+  BOOKINGS = loadBookings();
+  renderDashboard();
+  renderBookings();
+  renderPricing();
+  renderReviewsList();
+  renderSettings();
+}
+
+// Auto-login if session valid
+if(isLoggedIn()){
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app').classList.add('show');
+  bootApp();
+}else{
+  document.getElementById('login-pwd').focus();
+}
+
+// Listen for booking changes from public site (other tab)
+window.addEventListener('storage',e=>{
+  if(e.key==='killerzone_bookings'){
+    BOOKINGS = loadBookings();
+    if(document.getElementById('app').classList.contains('show')){
+      renderBookings();
+      renderDashboard();
+    }
+  }
+});
+</script>
+</div>
 </body>
 </html>
