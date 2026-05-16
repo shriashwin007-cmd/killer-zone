@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#05070c">
-<title>Xtreme Gaming Tribe - Luxury Gaming Lounge in Chennai</title>
-<meta name="description" content="Step into Tribe, a cinematic luxury gaming lounge in Chennai with themed rooms, PS5 sessions, neon ambience, snacks, and easy booking.">
+<title>Killer Zone - Luxury Gaming Lounge in Chennai</title>
+<meta name="description" content="Step into Killer Zone, a cinematic luxury gaming lounge in Chennai with themed rooms, PS5 sessions, neon ambience, snacks, and easy booking.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Rajdhani:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -51,6 +51,11 @@ body::before {
     linear-gradient(90deg, rgba(0,247,255,.045) 1px, transparent 1px);
   background-size: 56px 56px;
   mask-image: linear-gradient(to bottom, black, transparent 84%);
+  animation: gridMove 20s linear infinite;
+}
+@keyframes gridMove {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(56px); }
 }
 a { color: inherit; }
 button, input, select, textarea { font: inherit; }
@@ -85,6 +90,11 @@ img { max-width: 100%; display: block; }
   border-radius: 999px;
   background: var(--green);
   box-shadow: 0 0 18px var(--green);
+  animation: pulse 2s ease infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .7; transform: scale(1.2); }
 }
 .btn {
   display: inline-flex;
@@ -129,6 +139,11 @@ header {
   border-bottom: 1px solid rgba(255,255,255,.08);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  animation: slideDown .6s ease;
+}
+@keyframes slideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 .nav {
   min-height: 70px;
@@ -144,14 +159,22 @@ header {
   text-decoration: none;
 }
 .brand-mark {
-  width: 44px;
-  height: 44px;
-  border-radius: 13px;
+  width: 120px;
+  height: 52px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, rgba(0,247,255,.2), rgba(255,45,149,.2));
-  border: 1px solid rgba(255,255,255,.14);
-  font-size: 1.25rem;
+  overflow: hidden;
+  animation: logoFloat 3s ease-in-out infinite;
+}
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0,247,255,.4));
 }
 .brand-name {
   font-family: Orbitron, sans-serif;
@@ -176,10 +199,48 @@ header {
   text-decoration: none;
   font-size: .88rem;
   font-weight: 700;
+  transition: color .2s ease;
 }
 .nav-links a:hover { color: var(--cyan); }
 .menu-btn { display: none; }
 .mobile-panel { display: none; }
+.cart-btn {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.14);
+  color: var(--text);
+  background: rgba(255,255,255,.06);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.cart-btn:hover {
+  border-color: var(--cyan);
+  background: rgba(0,247,255,.1);
+}
+.cart-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--pink);
+  color: white;
+  font-size: .7rem;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  padding: 0 .35rem;
+  animation: pop .3s ease;
+}
+@keyframes pop {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
 main { position: relative; z-index: 1; }
 .hero {
   min-height: 100svh;
@@ -198,29 +259,42 @@ h1, h2, h3 { margin: 0; font-family: Orbitron, sans-serif; letter-spacing: 0; }
   margin: 1.1rem 0 .9rem;
   font-size: clamp(3.1rem, 8vw, 5.9rem);
   line-height: .96;
+  animation: fadeInUp .8s ease .2s backwards;
 }
 .grad {
   background: linear-gradient(92deg, var(--cyan), #f7fbff 42%, var(--pink));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  animation: gradientShift 3s ease infinite;
+}
+@keyframes gradientShift {
+  0%, 100% { filter: hue-rotate(0deg); }
+  50% { filter: hue-rotate(15deg); }
 }
 .hero-copy {
   max-width: 640px;
   color: var(--muted);
   font-size: clamp(1rem, 1.7vw, 1.16rem);
   line-height: 1.7;
+  animation: fadeInUp .8s ease .4s backwards;
 }
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
   gap: .8rem;
   margin: 1.6rem 0 1.8rem;
+  animation: fadeInUp .8s ease .6s backwards;
 }
 .quick-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: .75rem;
+  animation: fadeInUp .8s ease .8s backwards;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 .stat {
   min-height: 82px;
@@ -228,6 +302,11 @@ h1, h2, h3 { margin: 0; font-family: Orbitron, sans-serif; letter-spacing: 0; }
   border-radius: 16px;
   border: 1px solid rgba(255,255,255,.1);
   background: rgba(255,255,255,.045);
+  transition: all .3s ease;
+}
+.stat:hover {
+  border-color: rgba(0,247,255,.3);
+  transform: translateY(-4px);
 }
 .stat strong {
   display: block;
@@ -245,6 +324,7 @@ h1, h2, h3 { margin: 0; font-family: Orbitron, sans-serif; letter-spacing: 0; }
   border-radius: 26px;
   overflow: hidden;
   isolation: isolate;
+  animation: fadeInUp .8s ease .3s backwards;
 }
 .hero-visual::before {
   content: "";
@@ -316,7 +396,13 @@ section { padding: 76px 0; }
   min-height: 230px;
   border-radius: 18px;
   padding: 1.25rem;
+  transition: all .3s ease;
+  opacity: 0;
+  animation: fadeInUp .6s ease forwards;
 }
+.card:nth-child(1) { animation-delay: .1s; }
+.card:nth-child(2) { animation-delay: .2s; }
+.card:nth-child(3) { animation-delay: .3s; }
 .card .icon {
   font-size: 2.2rem;
   margin-bottom: .85rem;
@@ -330,6 +416,107 @@ section { padding: 76px 0; }
   line-height: 1.65;
   font-size: .9rem;
 }
+.add-ons-section {
+  background: radial-gradient(circle at 30% 50%, rgba(0,247,255,.08), transparent 50%);
+}
+.add-ons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+.add-on-card {
+  border-radius: 18px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: .85rem;
+  transition: all .3s ease;
+}
+.add-on-card:hover {
+  border-color: rgba(0,247,255,.3);
+  transform: translateY(-4px);
+}
+.add-on-header {
+  display: flex;
+  gap: .85rem;
+  align-items: start;
+}
+.add-on-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+}
+.add-on-info h3 {
+  font-size: 1.05rem;
+  margin-bottom: .3rem;
+}
+.add-on-info .price {
+  color: var(--cyan);
+  font-family: Orbitron, sans-serif;
+  font-size: .95rem;
+  font-weight: 800;
+}
+.add-on-desc {
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: .88rem;
+}
+.add-on-actions {
+  display: flex;
+  gap: .65rem;
+  align-items: center;
+  margin-top: auto;
+}
+.quantity-control {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 12px;
+  background: rgba(255,255,255,.05);
+  padding: .4rem .6rem;
+}
+.quantity-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.2);
+  background: rgba(255,255,255,.08);
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.quantity-btn:hover {
+  background: rgba(0,247,255,.15);
+  border-color: var(--cyan);
+}
+.quantity-btn:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+.quantity-display {
+  min-width: 28px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--cyan);
+}
+.add-to-cart-btn {
+  flex: 1;
+  min-height: 42px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  color: #021014;
+  background: linear-gradient(135deg, var(--cyan), var(--violet));
+  font-weight: 800;
+  cursor: pointer;
+  transition: all .2s ease;
+  font-size: .85rem;
+}
+.add-to-cart-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0,247,255,.3);
+}
 .gallery {
   display: grid;
   grid-template-columns: 1.2fr .8fr .8fr;
@@ -342,6 +529,7 @@ section { padding: 76px 0; }
   border-radius: 18px;
   border: 1px solid rgba(255,255,255,.1);
   background: rgba(255,255,255,.04);
+  transition: all .3s ease;
 }
 .tile:first-child { grid-row: span 2; }
 .tile img {
@@ -349,6 +537,11 @@ section { padding: 76px 0; }
   height: 100%;
   object-fit: cover;
   filter: saturate(1.08) brightness(.9);
+  transition: all .6s ease;
+}
+.tile:hover img {
+  transform: scale(1.08);
+  filter: saturate(1.3) brightness(1.05);
 }
 .tile span {
   position: absolute;
@@ -401,6 +594,7 @@ section { padding: 76px 0; }
   color: var(--text);
   padding: .85rem .95rem;
   outline: none;
+  transition: all .2s ease;
 }
 textarea.field { min-height: 92px; resize: vertical; grid-column: 1 / -1; }
 .field:focus { border-color: rgba(0,247,255,.6); box-shadow: 0 0 0 4px rgba(0,247,255,.08); }
@@ -466,6 +660,182 @@ footer {
   border: 1px solid rgba(0,247,255,.46);
   color: #001418;
   background: linear-gradient(135deg, var(--cyan), #dffcff);
+}
+.cart-panel {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 90;
+  width: min(420px, 100vw);
+  transform: translateX(100%);
+  transition: transform .3s ease;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: var(--safe-bottom);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+.cart-panel.open { transform: translateX(0); }
+.cart-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  z-index: 89;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+  backdrop-filter: blur(4px);
+}
+.cart-overlay.open { opacity: 1; pointer-events: auto; }
+.cart-header {
+  padding: 1.2rem 1.4rem;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cart-header h2 {
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+}
+.cart-close {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.14);
+  color: var(--text);
+  background: rgba(255,255,255,.06);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.cart-close:hover {
+  background: rgba(255,45,149,.2);
+  border-color: var(--pink);
+}
+.cart-items {
+  padding: 1rem 1.4rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: .85rem;
+}
+.cart-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 16px;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.08);
+  animation: slideInRight .3s ease;
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.cart-item-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+.cart-item-details {
+  flex: 1;
+}
+.cart-item-name {
+  font-weight: 700;
+  font-size: .95rem;
+  margin-bottom: .3rem;
+}
+.cart-item-price {
+  color: var(--cyan);
+  font-family: Orbitron, sans-serif;
+  font-size: .85rem;
+  font-weight: 700;
+}
+.cart-item-controls {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-top: .5rem;
+}
+.cart-item-qty-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.2);
+  background: rgba(255,255,255,.08);
+  color: var(--text);
+  font-size: .9rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.cart-item-qty {
+  min-width: 24px;
+  text-align: center;
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+.cart-item-remove {
+  margin-left: auto;
+  color: var(--pink);
+  cursor: pointer;
+  font-size: .85rem;
+  font-weight: 700;
+  padding: .4rem .6rem;
+  border-radius: 8px;
+  transition: all .2s ease;
+}
+.cart-item-remove:hover {
+  background: rgba(255,45,149,.15);
+}
+.cart-empty {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--soft);
+}
+.cart-empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: .3;
+}
+.cart-footer {
+  padding: 1.2rem 1.4rem;
+  border-top: 1px solid rgba(255,255,255,.1);
+}
+.cart-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: .8rem 0;
+}
+.cart-total-label {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.cart-total-amount {
+  font-size: 1.5rem;
+  font-family: Orbitron, sans-serif;
+  font-weight: 900;
+  color: var(--cyan);
+}
+.cart-checkout {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 14px;
+  border: 0;
+  color: #021014;
+  background: linear-gradient(135deg, var(--cyan), var(--violet));
+  font-weight: 900;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.cart-checkout:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0,247,255,.3);
 }
 .chat {
   position: fixed;
@@ -594,8 +964,6 @@ footer {
   .card:hover, .tile:hover, .info:hover, .price-list:hover, .booking-form:hover {
     border-color: rgba(0,247,255,.28);
   }
-  .tile img { transition: transform .7s ease, filter .3s ease; }
-  .tile:hover img { transform: scale(1.055); filter: saturate(1.2) brightness(1); }
 }
 @media (max-width: 920px) {
   .nav-links { display: none; }
@@ -636,7 +1004,7 @@ footer {
 }
 @media (max-width: 620px) {
   .wrap { width: min(100% - 24px, 1160px); }
-  .brand-mark { width: 40px; height: 40px; }
+  .brand-mark { width: 100px; height: 44px; }
   .brand-name { font-size: .88rem; }
   .brand-sub { font-size: .56rem; letter-spacing: .2em; }
   .hero h1 { font-size: clamp(2.75rem, 16vw, 4.1rem); }
@@ -666,6 +1034,7 @@ footer {
     height: min(660px, calc(100svh - 92px - var(--safe-bottom)));
     border-radius: 22px;
   }
+  .cart-panel { width: 100vw; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -681,23 +1050,28 @@ footer {
 <header>
   <nav class="wrap nav" aria-label="Primary navigation">
     <a class="brand" href="#home">
-      <span class="brand-mark" aria-hidden="true">🎮</span>
-      <span>
-        <span class="brand-name">KILLER ZONE</span>
-        <span class="brand-sub">Luxury Gaming Lounge</span>
-      </span>
+      <div class="brand-mark">
+        <!-- Replace this src with your logo file: "2026-04-17.jpg" or "killer-zone-logo.jpg" -->
+        <img src="2026-04-17.jpg" alt="Killer Zone Logo" onerror="this.parentElement.innerHTML='<span style=\'font-size:1.8rem\'>🎮</span>'">
+      </div>
     </a>
     <div class="nav-links">
       <a href="#rooms">Rooms</a>
+      <a href="#add-ons">Add-ons</a>
       <a href="#gallery">Gallery</a>
       <a href="#pricing">Pricing</a>
       <a href="#location">Location</a>
       <a class="btn btn-primary" href="#book">Book Now</a>
     </div>
+    <button class="cart-btn" id="cartBtn" aria-label="View cart">
+      🛒
+      <span class="cart-count" id="cartCount" style="display:none">0</span>
+    </button>
     <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
   </nav>
   <div class="mobile-panel" id="mobileMenu">
     <a href="#rooms">Rooms</a>
+    <a href="#add-ons">Add-ons</a>
     <a href="#gallery">Gallery</a>
     <a href="#pricing">Pricing</a>
     <a href="#location">Location</a>
@@ -727,7 +1101,7 @@ footer {
       <div class="hero-visual glass">
         <div class="visual-card glass">
           <h3>Forza, Spider-Verse, Gotham & Minecraft vibes</h3>
-          <p>Optimized for mobile touch, macOS Safari/Chrome, and smooth demo performance.</p>
+          <p>Premium gaming experience with snacks, drinks, and gaming add-ons available.</p>
         </div>
       </div>
     </div>
@@ -746,6 +1120,133 @@ footer {
         <article class="card glass"><div class="icon">🏎️</div><h3>Forza Horizon Room</h3><p>Best for racing nights, reels, and high-energy groups who want the most cinematic first impression.</p></article>
         <article class="card glass"><div class="icon">🕷️</div><h3>Spider-Verse Room</h3><p>Photo-friendly lighting, bold wall art, and a fun pick for birthdays, couples, and casual players.</p></article>
         <article class="card glass"><div class="icon">🦇</div><h3>Gotham x Minecraft Room</h3><p>A darker squad setup with character, strong contrast, and room for longer late-night sessions.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="add-ons" class="add-ons-section">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Enhance Your Session</div>
+          <h2>Gaming <span class="grad">Add-ons</span></h2>
+        </div>
+        <p>Level up your experience with snacks, drinks, and premium gaming gear.</p>
+      </div>
+      <div class="add-ons-grid">
+        <article class="add-on-card glass" data-item='{"id":"snack1","name":"Chips & Soda Combo","price":80,"icon":"🍿"}'>
+          <div class="add-on-header">
+            <div class="add-on-icon">🍿</div>
+            <div class="add-on-info">
+              <h3>Chips & Soda Combo</h3>
+              <div class="price">₹80</div>
+            </div>
+          </div>
+          <p class="add-on-desc">Crunchy chips with your choice of cold drink. Perfect snack for long sessions.</p>
+          <div class="add-on-actions">
+            <div class="quantity-control">
+              <button class="quantity-btn minus" disabled>−</button>
+              <span class="quantity-display">0</span>
+              <button class="quantity-btn plus">+</button>
+            </div>
+            <button class="add-to-cart-btn">Add to Cart</button>
+          </div>
+        </article>
+
+        <article class="add-on-card glass" data-item='{"id":"snack2","name":"Pizza Slice","price":120,"icon":"🍕"}'>
+          <div class="add-on-header">
+            <div class="add-on-icon">🍕</div>
+            <div class="add-on-info">
+              <h3>Pizza Slice</h3>
+              <div class="price">₹120</div>
+            </div>
+          </div>
+          <p class="add-on-desc">Hot and fresh pizza slice. Cheese, veggie, or pepperoni available.</p>
+          <div class="add-on-actions">
+            <div class="quantity-control">
+              <button class="quantity-btn minus" disabled>−</button>
+              <span class="quantity-display">0</span>
+              <button class="quantity-btn plus">+</button>
+            </div>
+            <button class="add-to-cart-btn">Add to Cart</button>
+          </div>
+        </article>
+
+        <article class="add-on-card glass" data-item='{"id":"drink1","name":"Energy Drink","price":60,"icon":"⚡"}'>
+          <div class="add-on-header">
+            <div class="add-on-icon">⚡</div>
+            <div class="add-on-info">
+              <h3>Energy Drink</h3>
+              <div class="price">₹60</div>
+            </div>
+          </div>
+          <p class="add-on-desc">Boost your reflexes. Red Bull, Monster, or similar energy drinks.</p>
+          <div class="add-on-actions">
+            <div class="quantity-control">
+              <button class="quantity-btn minus" disabled>−</button>
+              <span class="quantity-display">0</span>
+              <button class="quantity-btn plus">+</button>
+            </div>
+            <button class="add-to-cart-btn">Add to Cart</button>
+          </div>
+        </article>
+
+        <article class="add-on-card glass" data-item='{"id":"gear1","name":"Extra Controller","price":150,"icon":"🎮"}'>
+          <div class="add-on-header">
+            <div class="add-on-icon">🎮</div>
+            <div class="add-on-info">
+              <h3>Extra Controller</h3>
+              <div class="price">₹150/session</div>
+            </div>
+          </div>
+          <p class="add-on-desc">Need more controllers for your squad? Rent premium DualSense for your session.</p>
+          <div class="add-on-actions">
+            <div class="quantity-control">
+              <button class="quantity-btn minus" disabled>−</button>
+              <span class="quantity-display">0</span>
+              <button class="quantity-btn plus">+</button>
+            </div>
+            <button class="add-to-cart-btn">Add to Cart</button>
+          </div>
+        </article>
+
+        <article class="add-on-card glass" data-item='{"id":"gear2","name":"VR Headset","price":300,"icon":"🥽"}'>
+          <div class="add-on-header">
+            <div class="add-on-icon">🥽</div>
+            <div class="add-on-info">
+              <h3>VR Headset</h3>
+              <div class="price">₹300/session</div>
+            </div>
+          </div>
+          <p class="add-on-desc">Experience immersive VR gaming. PSVR2 available for compatible games.</p>
+          <div class="add-on-actions">
+            <div class="quantity-control">
+              <button class="quantity-btn minus" disabled>−</button>
+              <span class="quantity-display">0</span>
+              <button class="quantity-btn plus">+</button>
+            </div>
+            <button class="add-to-cart-btn">Add to Cart</button>
+          </div>
+        </article>
+
+        <article class="add-on-card glass" data-item='{"id":"snack3","name":"Gamer Meal Box","price":250,"icon":"🍔"}'>
+          <div class="add-on-header">
+            <div class="add-on-icon">🍔</div>
+            <div class="add-on-info">
+              <h3>Gamer Meal Box</h3>
+              <div class="price">₹250</div>
+            </div>
+          </div>
+          <p class="add-on-desc">Complete meal: burger, fries, drink. Perfect for extended gaming marathons.</p>
+          <div class="add-on-actions">
+            <div class="quantity-control">
+              <button class="quantity-btn minus" disabled>−</button>
+              <span class="quantity-display">0</span>
+              <button class="quantity-btn plus">+</button>
+            </div>
+            <button class="add-to-cart-btn">Add to Cart</button>
+          </div>
+        </article>
       </div>
     </div>
   </section>
@@ -790,7 +1291,7 @@ footer {
         <div class="eyebrow">Book Now</div>
         <h2>Reserve Your <span class="grad">Gaming Slot</span></h2>
         <div class="info-row"><small>Best for</small><span>Birthdays, squad sessions, dates, weekend gaming, and casual hangouts.</span></div>
-        <div class="info-row"><small>Tip</small><span>Use KZ Assist to choose the right room before you message staff.</span></div>
+        <div class="info-row"><small>Tip</small><span>Add snacks and gear to your cart first, then book your session with everything included.</span></div>
       </div>
       <form class="booking-form glass" id="bookingForm">
         <div class="form-grid">
@@ -806,7 +1307,7 @@ footer {
           <input class="field" name="players" type="number" min="1" max="12" placeholder="Players">
           <input class="field" name="date" type="date">
           <input class="field" name="time" placeholder="Preferred time">
-          <textarea class="field" name="notes" placeholder="Notes, game preference, birthday setup, snacks..."></textarea>
+          <textarea class="field" name="notes" placeholder="Notes, game preference, birthday setup..."></textarea>
         </div>
         <button class="btn btn-primary" type="submit">Send Booking on WhatsApp</button>
       </form>
@@ -835,6 +1336,29 @@ footer {
   </div>
 </footer>
 
+<!-- Cart Panel -->
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-panel glass" id="cartPanel">
+  <div class="cart-header">
+    <h2>🛒 Your Cart</h2>
+    <button class="cart-close" id="cartPanelClose">×</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty">
+      <div class="cart-empty-icon">🎮</div>
+      <p>Your cart is empty.<br>Add some snacks or gear to get started!</p>
+    </div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total">
+      <span class="cart-total-label">Total:</span>
+      <span class="cart-total-amount" id="cartTotal">₹0</span>
+    </div>
+    <button class="cart-checkout" id="checkoutBtn">Proceed to Checkout</button>
+  </div>
+</div>
+
+<!-- Chat -->
 <div class="chat glass" id="chat" aria-live="polite">
   <div class="chat-head">
     <div class="chat-title">
@@ -844,15 +1368,15 @@ footer {
     <button class="chat-close" type="button" id="chatClose" aria-label="Close chat">×</button>
   </div>
   <div class="messages" id="messages">
-    <div class="msg bot">Hey! I can help you pick a room, plan a birthday, ask about snacks, or draft a booking message for Killer Zone.</div>
+    <div class="msg bot">Hey! I can help you pick a room, plan a birthday, recommend add-ons, or draft a booking message for Killer Zone.</div>
   </div>
   <div class="suggestions" id="suggestions">
     <button type="button">Which room is best for 4 friends?</button>
+    <button type="button">What snacks do you recommend?</button>
     <button type="button">Plan a birthday session</button>
-    <button type="button">What should beginners play?</button>
   </div>
   <form class="chat-form" id="chatForm">
-    <input id="chatInput" autocomplete="off" placeholder="Ask about rooms, pricing, games...">
+    <input id="chatInput" autocomplete="off" placeholder="Ask about rooms, pricing, add-ons...">
     <button type="submit" aria-label="Send">➜</button>
   </form>
 </div>
@@ -866,16 +1390,21 @@ footer {
 
 <script>
 const $ = selector => document.querySelector(selector);
+const $$ = selector => document.querySelectorAll(selector);
 const menu = $('#mobileMenu');
 const messages = $('#messages');
 const chat = $('#chat');
 const chatInput = $('#chatInput');
 const history = [];
 
+// Cart state
+let cart = [];
+
 $('#year').textContent = new Date().getFullYear();
 $('#menuBtn').addEventListener('click', () => menu.classList.toggle('open'));
 menu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => menu.classList.remove('open')));
 
+// Chat handlers
 document.querySelectorAll('[data-chat-open]').forEach(button => {
   button.addEventListener('click', () => {
     chat.classList.add('open');
@@ -884,12 +1413,173 @@ document.querySelectorAll('[data-chat-open]').forEach(button => {
 });
 $('#chatClose').addEventListener('click', () => chat.classList.remove('open'));
 
+// Cart handlers
+$('#cartBtn').addEventListener('click', () => {
+  $('#cartPanel').classList.add('open');
+  $('#cartOverlay').classList.add('open');
+});
+
+$('#cartPanelClose').addEventListener('click', closeCart);
+$('#cartOverlay').addEventListener('click', closeCart);
+
+function closeCart() {
+  $('#cartPanel').classList.remove('open');
+  $('#cartOverlay').classList.remove('open');
+}
+
 function toast(message) {
   const el = $('#toast');
   el.textContent = message;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2200);
 }
+
+function updateCartUI() {
+  const count = $('#cartCount');
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const itemsContainer = $('#cartItems');
+  
+  if (cart.length === 0) {
+    count.style.display = 'none';
+    itemsContainer.innerHTML = '<div class="cart-empty"><div class="cart-empty-icon">🎮</div><p>Your cart is empty.<br>Add some snacks or gear to get started!</p></div>';
+  } else {
+    count.style.display = 'grid';
+    count.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+    
+    itemsContainer.innerHTML = cart.map(item => `
+      <div class="cart-item" data-id="${item.id}">
+        <div class="cart-item-icon">${item.icon}</div>
+        <div class="cart-item-details">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-price">₹${item.price} each</div>
+          <div class="cart-item-controls">
+            <button class="cart-item-qty-btn minus">−</button>
+            <span class="cart-item-qty">${item.quantity}</span>
+            <button class="cart-item-qty-btn plus">+</button>
+          </div>
+        </div>
+        <button class="cart-item-remove">Remove</button>
+      </div>
+    `).join('');
+    
+    // Add event listeners to cart item controls
+    $$('.cart-item-qty-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const itemEl = e.target.closest('.cart-item');
+        const itemId = itemEl.dataset.id;
+        const isPlus = e.target.classList.contains('plus');
+        
+        const cartItem = cart.find(item => item.id === itemId);
+        if (cartItem) {
+          if (isPlus) {
+            cartItem.quantity++;
+          } else if (cartItem.quantity > 1) {
+            cartItem.quantity--;
+          }
+          updateCartUI();
+          updateAddOnCardUI(itemId, cartItem.quantity);
+        }
+      });
+    });
+    
+    $$('.cart-item-remove').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const itemEl = e.target.closest('.cart-item');
+        const itemId = itemEl.dataset.id;
+        cart = cart.filter(item => item.id !== itemId);
+        updateCartUI();
+        updateAddOnCardUI(itemId, 0);
+        toast('Item removed from cart');
+      });
+    });
+  }
+  
+  $('#cartTotal').textContent = `₹${total}`;
+}
+
+function updateAddOnCardUI(itemId, quantity) {
+  const card = $(`.add-on-card[data-item*='"id":"${itemId}"']`);
+  if (!card) return;
+  
+  const qtyDisplay = card.querySelector('.quantity-display');
+  const minusBtn = card.querySelector('.quantity-btn.minus');
+  const plusBtn = card.querySelector('.quantity-btn.plus');
+  
+  qtyDisplay.textContent = quantity;
+  minusBtn.disabled = quantity === 0;
+}
+
+// Add-on card handlers
+$$('.add-on-card').forEach(card => {
+  const itemData = JSON.parse(card.dataset.item);
+  const qtyDisplay = card.querySelector('.quantity-display');
+  const minusBtn = card.querySelector('.quantity-btn.minus');
+  const plusBtn = card.querySelector('.quantity-btn.plus');
+  const addBtn = card.querySelector('.add-to-cart-btn');
+  
+  let quantity = 0;
+  
+  plusBtn.addEventListener('click', () => {
+    quantity++;
+    qtyDisplay.textContent = quantity;
+    minusBtn.disabled = false;
+  });
+  
+  minusBtn.addEventListener('click', () => {
+    if (quantity > 0) {
+      quantity--;
+      qtyDisplay.textContent = quantity;
+      if (quantity === 0) minusBtn.disabled = true;
+    }
+  });
+  
+  addBtn.addEventListener('click', () => {
+    if (quantity === 0) {
+      toast('Please select quantity first');
+      return;
+    }
+    
+    const existingItem = cart.find(item => item.id === itemData.id);
+    
+    if (existingItem) {
+      existingItem.quantity += quantity;
+    } else {
+      cart.push({
+        ...itemData,
+        quantity
+      });
+    }
+    
+    updateCartUI();
+    toast(`${itemData.name} added to cart!`);
+    
+    // Reset quantity
+    quantity = 0;
+    qtyDisplay.textContent = 0;
+    minusBtn.disabled = true;
+  });
+});
+
+// Checkout handler
+$('#checkoutBtn').addEventListener('click', () => {
+  if (cart.length === 0) {
+    toast('Your cart is empty!');
+    return;
+  }
+  
+  const cartSummary = cart.map(item => 
+    `${item.quantity}x ${item.name} - ₹${item.price * item.quantity}`
+  ).join('\n');
+  
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  
+  const message = `Hi Killer Zone! I want to order:\n\n${cartSummary}\n\nTotal: ₹${total}`;
+  
+  const url = `https://wa.me/917358546431?text=${encodeURIComponent(message)}`;
+  window.open(url, '_blank', 'noopener,noreferrer');
+  
+  toast('Opening WhatsApp with your order...');
+});
 
 function addMessage(role, text) {
   const bubble = document.createElement('div');
@@ -913,18 +1603,22 @@ async function sendChat(message) {
   typing.textContent = 'KZ Assist is checking that...';
   messages.appendChild(typing);
   messages.scrollTop = messages.scrollHeight;
-  try {
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, history: requestHistory })
-    });
-    const data = await response.json();
-    typing.textContent = data.reply || 'I can help with room choice, booking details, snacks, and session planning.';
-    history.push({ role: 'assistant', content: typing.textContent });
-  } catch (error) {
-    typing.textContent = 'Demo reply: For groups, choose Forza for energy or Spider-Verse for photos. Share date, time, player count, and room preference to book.';
+  
+  // Demo replies with add-on awareness
+  let reply = 'I can help with room choice, booking details, snacks, add-ons, and session planning.';
+  
+  if (message.toLowerCase().includes('snack') || message.toLowerCase().includes('food') || message.toLowerCase().includes('eat')) {
+    reply = 'Popular choices: Chips & Soda (₹80), Pizza Slice (₹120), or the full Gamer Meal Box (₹250). Energy drinks available for ₹60. Just scroll to Add-ons and tap to order!';
+  } else if (message.toLowerCase().includes('room') || message.toLowerCase().includes('which')) {
+    reply = 'For 4 friends, I recommend Forza Room for energy or Spider-Verse for photos. Gotham is great for darker vibes. All have PS5 and snack service!';
+  } else if (message.toLowerCase().includes('controller') || message.toLowerCase().includes('gear') || message.toLowerCase().includes('vr')) {
+    reply = 'Extra controllers are ₹150/session, VR headsets ₹300/session. Add them to your cart and they\'ll be ready when you arrive!';
+  } else if (message.toLowerCase().includes('birthday')) {
+    reply = 'Birthday packages can include room booking + Gamer Meal Boxes + decorations. Book a 3-hour slot and add snacks to cart. We\'ll set up the rest!';
   }
+  
+  typing.textContent = reply;
+  history.push({ role: 'assistant', content: reply });
 }
 
 $('#chatForm').addEventListener('submit', event => {
@@ -942,7 +1636,8 @@ $('#suggestions').addEventListener('click', event => {
 $('#bookingForm').addEventListener('submit', event => {
   event.preventDefault();
   const data = new FormData(event.currentTarget);
-  const lines = [
+  
+  let lines = [
     'Hi Killer Zone! I want to book a gaming session.',
     `Name: ${data.get('name') || '-'}`,
     `Phone: ${data.get('phone') || '-'}`,
@@ -952,6 +1647,16 @@ $('#bookingForm').addEventListener('submit', event => {
     `Time: ${data.get('time') || 'Flexible'}`,
     `Notes: ${data.get('notes') || '-'}`
   ];
+  
+  if (cart.length > 0) {
+    lines.push('\n--- Add-ons ---');
+    cart.forEach(item => {
+      lines.push(`${item.quantity}x ${item.name} - ₹${item.price * item.quantity}`);
+    });
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    lines.push(`Add-ons Total: ₹${total}`);
+  }
+  
   const url = `https://wa.me/917358546431?text=${encodeURIComponent(lines.join('\n'))}`;
   window.open(url, '_blank', 'noopener,noreferrer');
   toast('Opening WhatsApp booking message');
@@ -969,6 +1674,31 @@ document.querySelectorAll('.tile img').forEach((img) => {
     fallback.textContent = label;
     img.closest('.tile')?.prepend(fallback);
   }, { once: true });
+});
+
+// Initialize scroll animations
+const observerOptions = {
+  threshold: 0.1,
+  rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateY(0)';
+    }
+  });
+}, observerOptions);
+
+// Observe sections for scroll animations
+$$('section').forEach((section, index) => {
+  if (index > 0) {
+    section.style.opacity = '0';
+    section.style.transform = 'translateY(30px)';
+    section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(section);
+  }
 });
 </script>
 </body>
