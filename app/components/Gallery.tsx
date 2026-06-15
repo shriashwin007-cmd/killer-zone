@@ -1,106 +1,73 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 
-type Tile = {
-  label: string;
-  span: boolean;
-  factor: number;
-  img?: string;
-  icon?: string;
-};
-
-const TILES: Tile[] = [
+const IMAGES = [
   {
-    label: "Gaming Lounge",
-    img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781542714/gaming_lounge_setup_2_swhsrh.png",
+    src: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781542714/gaming_lounge_setup_2_swhsrh.png",
+    label: "The Lounge",
     span: true,
-    factor: 0.15,
   },
   {
-    label: "PS5 Controllers",
-    img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781542711/fortnite_and_joker_ps5_controllers_xc7gxl.png",
+    src: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781542711/fortnite_and_joker_ps5_controllers_xc7gxl.png",
+    label: "Premium Controllers",
     span: false,
-    factor: 0.12,
   },
-  { label: "Battle Stations", icon: "🖥️", span: false, factor: 0.1 },
-  { label: "Neon Details",    icon: "💡", span: false, factor: 0.13 },
-  { label: "Premium Display", icon: "📺", span: false, factor: 0.11 },
+  {
+    src: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781542712/forza_horizon_6_mural_wouom2.png",
+    label: "Forza Mural",
+    span: false,
+  },
+  {
+    src: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781542716/joker_ps5_controller_jxdrof.png",
+    label: "Joker × PS5",
+    span: false,
+  },
+  {
+    src: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781542718/red_dead_redemption_mural_dj8ar8.png",
+    label: "Red Dead Mural",
+    span: false,
+  },
 ];
 
-function ParallaxTile({ t }: { t: Tile }) {
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
-
-  useEffect(() => {
-    if (!t.img) return;
-    const onScroll = () => {
-      if (!wrapRef.current || !imgRef.current) return;
-      const rect = wrapRef.current.getBoundingClientRect();
-      const offset = (rect.top + rect.height / 2 - window.innerHeight / 2) * t.factor;
-      imgRef.current.style.transform = `translateY(${offset}px)`;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [t.img, t.factor]);
-
-  if (t.img) {
-    return (
-      <div
-        ref={wrapRef}
-        style={{
-          borderRadius: 16,
-          gridRow: t.span ? "span 2" : undefined,
-          position: "relative",
-          overflow: "hidden",
-          border: "1px solid rgba(255,255,255,0.07)",
-        }}
-      >
-        <img
-          ref={imgRef}
-          src={t.img}
-          alt={t.label}
-          style={{
-            position: "absolute",
-            top: "-20%",
-            left: 0,
-            width: "100%",
-            height: "140%",
-            objectFit: "cover",
-            willChange: "transform",
-            transition: "transform 0.08s linear",
-          }}
-        />
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "linear-gradient(180deg, transparent 55%, rgba(2,7,20,0.78) 100%)",
-          pointerEvents: "none",
-        }} />
-        <div style={{
-          position: "absolute", left: 10, right: 10, bottom: 10,
-          padding: "8px 12px", borderRadius: 10,
-          background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.1)",
-          backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)",
-          fontFamily: "Orbitron, sans-serif", fontSize: "0.72rem", letterSpacing: "0.08em",
-          fontWeight: 800, textTransform: "uppercase", color: "#f8fbff",
-        }}>{t.label}</div>
-      </div>
-    );
-  }
+function GalleryTile({ tile }: { tile: typeof IMAGES[0] }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], ["-30px", "30px"]);
 
   return (
     <div
-      className="img-placeholder glass"
+      ref={ref}
       style={{
         borderRadius: 16,
-        gridRow: t.span ? "span 2" : undefined,
+        gridRow: tile.span ? "span 2" : undefined,
         position: "relative",
         overflow: "hidden",
-        flexDirection: "column",
+        border: "1px solid rgba(255,255,255,0.08)",
       }}
     >
-      <span style={{ fontSize: "2.8rem", marginBottom: 8 }}>{t.icon}</span>
-      <span style={{ fontFamily: "Orbitron, sans-serif", fontSize: "0.7rem", letterSpacing: "0.1em" }}>{t.label}</span>
+      <motion.img
+        src={tile.src}
+        alt={tile.label}
+        style={{
+          y,
+          position: "absolute",
+          top: -40,
+          left: 0,
+          width: "100%",
+          height: "calc(100% + 80px)",
+          objectFit: "cover",
+          willChange: "transform",
+        }}
+      />
+      <div style={{
+        position: "absolute", inset: 0,
+        background: "linear-gradient(180deg, transparent 55%, rgba(2,7,20,0.8) 100%)",
+        pointerEvents: "none",
+      }} />
       <div style={{
         position: "absolute", left: 10, right: 10, bottom: 10,
         padding: "8px 12px", borderRadius: 10,
@@ -108,7 +75,7 @@ function ParallaxTile({ t }: { t: Tile }) {
         backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)",
         fontFamily: "Orbitron, sans-serif", fontSize: "0.72rem", letterSpacing: "0.08em",
         fontWeight: 800, textTransform: "uppercase", color: "#f8fbff",
-      }}>{t.label}</div>
+      }}>{tile.label}</div>
     </div>
   );
 }
@@ -128,7 +95,7 @@ export default function Gallery() {
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gridAutoRows: "200px", gap: 12 }}>
-          {TILES.map((t) => <ParallaxTile key={t.label} t={t} />)}
+          {IMAGES.map((img) => <GalleryTile key={img.label} tile={img} />)}
         </div>
       </div>
 

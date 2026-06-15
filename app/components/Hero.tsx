@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const STATS = [
   { value: "PS5", label: "4K displays" },
@@ -9,19 +10,15 @@ const STATS = [
 ];
 
 export default function Hero({ onChatOpen }: { onChatOpen: () => void }) {
-  const imgRef = useRef<HTMLImageElement>(null);
-
-  useEffect(() => {
-    const onScroll = () => {
-      if (!imgRef.current) return;
-      imgRef.current.style.transform = `translateY(${window.scrollY * 0.18}px)`;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], ["0px", "80px"]);
 
   return (
-    <section id="home" style={{ minHeight: "100svh", display: "grid", alignItems: "center", paddingTop: "calc(90px + env(safe-area-inset-top, 0px))", paddingBottom: 56, position: "relative", zIndex: 1 }}>
+    <section ref={sectionRef} id="home" style={{ minHeight: "100svh", display: "grid", alignItems: "center", paddingTop: "calc(90px + env(safe-area-inset-top, 0px))", paddingBottom: 56, position: "relative", zIndex: 1 }}>
       <div className="wrap" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(2rem,5vw,4rem)", alignItems: "center" }}>
 
         {/* Left */}
@@ -64,26 +61,23 @@ export default function Hero({ onChatOpen }: { onChatOpen: () => void }) {
           </div>
         </div>
 
-        {/* Right – parallax hero image */}
+        {/* Right – framer-motion parallax */}
         <div style={{ borderRadius: 24, overflow: "hidden", minHeight: 500, position: "relative", border: "1px solid rgba(0,247,255,0.22)", boxShadow: "0 0 80px rgba(0,247,255,0.1), 0 0 120px rgba(138,92,255,0.06)" }}>
-          <img
-            ref={imgRef}
+          <motion.img
             src="https://res.cloudinary.com/dxvui0xkz/image/upload/v1781542712/gaming_lounge_setup_1_kigpow.png"
             alt="Killer Zone Gaming Lounge"
             style={{
+              y,
               position: "absolute",
-              top: "-20%",
+              top: -80,
               left: 0,
               width: "100%",
-              height: "140%",
+              height: "calc(100% + 160px)",
               objectFit: "cover",
               willChange: "transform",
-              transition: "transform 0.08s linear",
             }}
           />
-          {/* Bottom fade */}
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 55%, rgba(2,7,20,0.72) 100%)", pointerEvents: "none" }} />
-          {/* Neon colour wash */}
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(0,247,255,0.07) 0%, transparent 50%, rgba(138,92,255,0.07) 100%)", pointerEvents: "none" }} />
         </div>
       </div>

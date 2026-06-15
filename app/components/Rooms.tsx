@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const ROOMS = [
   {
@@ -23,20 +24,12 @@ const ROOMS = [
 ];
 
 function RoomCard({ r }: { r: typeof ROOMS[0] }) {
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
-
-  useEffect(() => {
-    const onScroll = () => {
-      if (!wrapRef.current || !imgRef.current) return;
-      const rect = wrapRef.current.getBoundingClientRect();
-      const offset = (rect.top + rect.height / 2 - window.innerHeight / 2) * 0.12;
-      imgRef.current.style.transform = `translateY(${offset}px)`;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], ["-30px", "30px"]);
 
   return (
     <article
@@ -54,33 +47,25 @@ function RoomCard({ r }: { r: typeof ROOMS[0] }) {
       }}
     >
       {/* Parallax image */}
-      <div ref={wrapRef} style={{ height: 220, overflow: "hidden", position: "relative" }}>
-        <img
-          ref={imgRef}
+      <div ref={ref} style={{ height: 220, overflow: "hidden", position: "relative" }}>
+        <motion.img
           src={r.img}
           alt={r.name}
           style={{
+            y,
             position: "absolute",
-            top: "-20%",
+            top: -40,
             left: 0,
             width: "100%",
-            height: "140%",
+            height: "calc(100% + 80px)",
             objectFit: "cover",
             willChange: "transform",
-            transition: "transform 0.08s linear",
           }}
         />
-        <div style={{
-          position: "absolute", inset: 0,
-          background: `linear-gradient(180deg, transparent 45%, rgba(2,7,20,0.65) 100%)`,
-        }} />
-        <div style={{
-          position: "absolute", inset: 0,
-          background: `linear-gradient(135deg, ${r.color}0a 0%, transparent 60%)`,
-        }} />
+        <div style={{ position: "absolute", inset: 0, background: `linear-gradient(180deg, transparent 45%, rgba(2,7,20,0.65) 100%)` }} />
+        <div style={{ position: "absolute", inset: 0, background: `linear-gradient(135deg, ${r.color}0a 0%, transparent 60%)` }} />
       </div>
 
-      {/* Text */}
       <div style={{ padding: "20px 20px 24px" }}>
         <h3 style={{ fontFamily: "Orbitron, sans-serif", fontSize: "0.95rem", marginBottom: 10, color: r.color }}>{r.name}</h3>
         <p style={{ color: "rgba(248,251,255,0.65)", lineHeight: 1.65, fontSize: "0.88rem", marginBottom: 16 }}>{r.desc}</p>
