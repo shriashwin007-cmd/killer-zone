@@ -37,11 +37,6 @@ const SNACKS: Item[] = [
   { id: "sn10", name: "Bingo Cream & Onion",     price: 30, icon: "🧅", label: "₹30", desc: "Bingo Cream & Onion — smooth and crispy.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781541649/bingo_cream_and_onion_ox0rrx.jpg" },
 ];
 
-const GEAR: Item[] = [
-  { id: "gear1", name: "Extra Controller", price: 150, icon: "🎮", label: "₹150/session", desc: "Rent a premium DualSense for your squad." },
-  { id: "gear2", name: "VR Headset",       price: 300, icon: "🥽", label: "₹300/session", desc: "PSVR2 for compatible games. Fully immersive." },
-];
-
 /* ── Particle burst on image click ── */
 interface Particle { id: number; x: number; y: number; vx: number; vy: number; emoji: string; rotate: number }
 
@@ -133,6 +128,7 @@ function Card({ item }: { item: Item }) {
 
       {/* Image area */}
       <div
+        className="addon-img"
         onClick={handleImgClick}
         style={{
           height: 180, cursor: "pointer", position: "relative", overflow: "visible",
@@ -206,23 +202,23 @@ function Card({ item }: { item: Item }) {
         <p style={{ color: "rgba(248,251,255,0.6)", fontSize: "0.8rem", lineHeight: 1.55, flex: 1 }}>{item.desc}</p>
 
         {/* Controls */}
-        <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: "auto" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "5px 8px", background: "rgba(255,255,255,0.04)" }}>
-            <button disabled={qty === 0} onClick={() => setQty((q) => Math.max(0, q - 1))}
-              style={{ width: 26, height: 26, borderRadius: 7, border: "1px solid rgba(255,255,255,0.16)", background: "rgba(255,255,255,0.06)", color: "#f8fbff", fontWeight: 800, cursor: qty === 0 ? "not-allowed" : "pointer", opacity: qty === 0 ? 0.35 : 1, fontFamily: "inherit", fontSize: "0.9rem" }}>−</button>
+        <div className="addon-controls" style={{ display: "flex", gap: 8, alignItems: "center", marginTop: "auto" }}>
+          <div className="addon-stepper" style={{ display: "flex", alignItems: "center", gap: 6, border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "5px 8px", background: "rgba(255,255,255,0.04)" }}>
+            <button className="addon-step" disabled={qty === 0} onClick={() => setQty((q) => Math.max(0, q - 1))}
+              style={{ width: 28, height: 28, borderRadius: 7, border: "1px solid rgba(255,255,255,0.16)", background: "rgba(255,255,255,0.06)", color: "#f8fbff", fontWeight: 800, cursor: qty === 0 ? "not-allowed" : "pointer", opacity: qty === 0 ? 0.35 : 1, fontFamily: "inherit", fontSize: "0.9rem" }}>−</button>
             <span style={{ minWidth: 22, textAlign: "center", fontWeight: 700, color: "#00f7ff", fontSize: "0.9rem" }}>{qty}</span>
-            <button onClick={() => setQty((q) => q + 1)}
-              style={{ width: 26, height: 26, borderRadius: 7, border: "1px solid rgba(255,255,255,0.16)", background: "rgba(255,255,255,0.06)", color: "#f8fbff", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", fontSize: "0.9rem" }}>+</button>
+            <button className="addon-step" onClick={() => setQty((q) => q + 1)}
+              style={{ width: 28, height: 28, borderRadius: 7, border: "1px solid rgba(255,255,255,0.16)", background: "rgba(255,255,255,0.06)", color: "#f8fbff", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", fontSize: "0.9rem" }}>+</button>
           </div>
-          <button onClick={() => {
+          <button className="addon-add" onClick={() => {
             if (qty === 0) { show("Select a quantity first"); return; }
             addToCart({ id: item.id, name: item.name, price: item.price, icon: item.icon }, qty);
             show(`${item.name} added! 🛒`);
             setQty(0);
           }} style={{
-            flex: 1, minHeight: 38, borderRadius: 10, border: "none",
+            flex: 1, minHeight: 42, borderRadius: 10, border: "none",
             color: "#021014", background: hovered ? "linear-gradient(135deg,#00f7ff,#ff2d95)" : "linear-gradient(135deg,#00f7ff,#8a5cff)",
-            fontWeight: 800, cursor: "pointer", fontSize: "0.8rem", fontFamily: "inherit",
+            fontWeight: 800, cursor: "pointer", fontSize: "0.82rem", fontFamily: "inherit",
             transition: "background .3s",
           }}>Add to Cart</button>
         </div>
@@ -231,12 +227,11 @@ function Card({ item }: { item: Item }) {
   );
 }
 
-type Tab = "beverages" | "snacks" | "gear";
-const TAB_ITEMS: Record<Tab, Item[]> = { beverages: BEVERAGES, snacks: SNACKS, gear: GEAR };
+type Tab = "beverages" | "snacks";
+const TAB_ITEMS: Record<Tab, Item[]> = { beverages: BEVERAGES, snacks: SNACKS };
 const TABS: { key: Tab; label: string; icon: string }[] = [
-  { key: "beverages", label: "Beverages",   icon: "🥤" },
-  { key: "snacks",    label: "Snacks",      icon: "🍿" },
-  { key: "gear",      label: "Gaming Gear", icon: "🎮" },
+  { key: "beverages", label: "Beverages", icon: "🥤" },
+  { key: "snacks",    label: "Snacks",    icon: "🍿" },
 ];
 
 export default function AddOns() {
@@ -261,8 +256,19 @@ export default function AddOns() {
           100% { transform: translate(var(--vx), var(--vy)) scale(0)   opacity(0); opacity: 0; }
         }
         @media (max-width: 1000px) { #add-ons .addon-grid { grid-template-columns: repeat(3,1fr) !important; } }
-        @media (max-width: 720px)  { #add-ons .addon-grid { grid-template-columns: repeat(2,1fr) !important; } }
-        @media (max-width: 480px)  { #add-ons .addon-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 720px)  { #add-ons .addon-grid { grid-template-columns: repeat(2,1fr) !important; gap: 10px !important; } }
+        /* Phones: keep a 2-up shop grid (denser, app-like) instead of 1 huge card */
+        @media (max-width: 600px) {
+          #add-ons .addon-img      { height: 130px !important; }
+          #add-ons .addon-img img  { padding: 8px !important; }
+          #add-ons .addon-grid article > div:last-child { padding: 12px 12px 14px !important; gap: 8px !important; }
+          #add-ons .addon-add      { font-size: 0.78rem !important; min-height: 44px !important; }
+          #add-ons .addon-step     { width: 30px !important; height: 30px !important; }
+        }
+        @media (max-width: 360px) {
+          #add-ons .addon-grid { grid-template-columns: 1fr !important; }
+          #add-ons .addon-img  { height: 160px !important; }
+        }
       `}</style>
 
       <div className="wrap">
@@ -273,7 +279,7 @@ export default function AddOns() {
             Gaming <span className="grad">Add-ons</span>
           </h2>
           <p style={{ color: "rgba(248,251,255,0.65)", marginTop: 10, lineHeight: 1.65 }}>
-            Order beverages, snacks, and gear — tap a product image to see it come alive! 🎉
+            Order beverages and snacks — tap a product image to see it come alive! 🎉
           </p>
         </div>
 
