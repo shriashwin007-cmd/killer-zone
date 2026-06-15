@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     const { message, history = [] } = await req.json();
 
     const response = await client.messages.create({
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-haiku-4-5",
       max_tokens: 250,
       system: `You are KZ Assist, the AI concierge for Killer Zone — a premium PS5 gaming lounge in Chennai, India.
 
@@ -41,10 +41,9 @@ Keep replies to 1-2 sentences. Be enthusiastic, friendly, and use casual gaming 
         : "Let me help you with that!";
 
     return NextResponse.json({ reply: text });
-  } catch (err) {
-    console.error("Chat API error:", err);
-    return NextResponse.json({
-      reply: "I'm having a connection issue right now. For instant help, WhatsApp us at +91 73585 46431! 💬",
-    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("Chat API error:", msg);
+    return NextResponse.json({ reply: `[debug] ${msg}` });
   }
 }
