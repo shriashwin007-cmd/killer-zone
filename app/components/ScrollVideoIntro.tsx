@@ -1,70 +1,80 @@
 "use client";
 import { useEffect, useRef } from "react";
 
+// Cloudinary: auto quality + limit to 1280px wide = faster decode = smoother scrub
 const VIDEO_URL =
-  "https://res.cloudinary.com/dxvui0xkz/video/upload/v1781549761/Killer_Zone_logo_animation_202606151758_aiux2e.mp4";
+  "https://res.cloudinary.com/dxvui0xkz/video/upload/q_auto:good,w_1280,c_limit/v1781549761/Killer_Zone_logo_animation_202606151758_aiux2e.mp4";
 
 export default function ScrollVideoIntro() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const overlayRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef<number | null>(null);
-  const targetTime = useRef(0);
+  const videoRef     = useRef<HTMLVideoElement>(null);
+  const overlayRef   = useRef<HTMLDivElement>(null);
+  const hintRef      = useRef<HTMLDivElement>(null);
+  const progress     = useRef(0);
+  const ticking      = useRef(false);
+  const rafId        = useRef<number | null>(null);
 
   useEffect(() => {
-    const video = videoRef.current;
+    const video     = videoRef.current;
     const container = containerRef.current;
-    const overlay = overlayRef.current;
+    const overlay   = overlayRef.current;
+    const hint      = hintRef.current;
     if (!video || !container || !overlay) return;
 
-    // Keep video paused — we control playback via currentTime
     video.pause();
 
-    const onScroll = () => {
-      const rect = container.getBoundingClientRect();
-      const scrollable = container.offsetHeight - window.innerHeight;
-      const scrolled = Math.max(0, -rect.top);
-      const progress = Math.min(1, scrolled / scrollable);
+    // ── called at most once per animation frame ──────────────────────────────
+    const commit = () => {
+      const p = progress.current;
 
-      // Target video time
-      if (video.duration) {
-        targetTime.current = progress * video.duration;
-      }
-
-      // Fade-to-site in final 30% of scroll
-      const FADE_START = 0.7;
-      const fadeT = progress > FADE_START ? (progress - FADE_START) / (1 - FADE_START) : 0;
-      const eased = fadeT < 0.5 ? 2 * fadeT * fadeT : 1 - Math.pow(-2 * fadeT + 2, 2) / 2;
-      overlay.style.opacity = String(eased);
-    };
-
-    // rAF loop for buttery currentTime scrubbing
-    const tick = () => {
-      if (video.readyState >= 2) {
-        const diff = targetTime.current - video.currentTime;
-        if (Math.abs(diff) > 0.01) {
-          video.currentTime += diff * 0.18; // lerp toward target
+      // Seek — fastSeek is less precise but way smoother (Firefox + some Chrome)
+      if (video.readyState >= 2 && video.duration) {
+        const t = p * video.duration;
+        if (typeof (video as HTMLVideoElement & { fastSeek?: (t: number) => void }).fastSeek === "function") {
+          (video as HTMLVideoElement & { fastSeek: (t: number) => void }).fastSeek(t);
+        } else {
+          video.currentTime = t;
         }
       }
-      rafRef.current = requestAnimationFrame(tick);
+
+      // Overlay blend (last 30%)
+      const FADE = 0.7;
+      const raw  = p > FADE ? (p - FADE) / (1 - FADE) : 0;
+      const ease = raw < 0.5 ? 2 * raw * raw : 1 - Math.pow(-2 * raw + 2, 2) / 2;
+      overlay.style.opacity = String(ease);
+
+      // Hint fades out quickly
+      if (hint) hint.style.opacity = String(Math.max(0, 1 - p * 8));
+
+      ticking.current = false;
+    };
+
+    const onScroll = () => {
+      const rect      = container.getBoundingClientRect();
+      const scrollable = container.offsetHeight - window.innerHeight;
+      const scrolled  = Math.max(0, -rect.top);
+      progress.current = Math.min(1, scrolled / scrollable);
+
+      // Throttle to one rAF per scroll burst
+      if (!ticking.current) {
+        ticking.current = true;
+        rafId.current = requestAnimationFrame(commit);
+      }
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
-    rafRef.current = requestAnimationFrame(tick);
-
     return () => {
       window.removeEventListener("scroll", onScroll);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (rafId.current) cancelAnimationFrame(rafId.current);
     };
   }, []);
 
   return (
-    <div ref={containerRef} style={{ height: "280vh", position: "relative" }}>
-      <div style={{
-        position: "sticky", top: 0, height: "100vh",
-        overflow: "hidden", background: "#000",
-      }}>
-        {/* The video — fills viewport */}
+    <div ref={containerRef} style={{ height: "260vh", position: "relative" }}>
+      {/* ── Sticky viewport ─────────────────────────────────────────────────── */}
+      <div style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden", background: "#000" }}>
+
+        {/* Video — GPU-promoted layer for smooth compositing */}
         <video
           ref={videoRef}
           src={VIDEO_URL}
@@ -75,43 +85,48 @@ export default function ScrollVideoIntro() {
             position: "absolute", inset: 0,
             width: "100%", height: "100%",
             objectFit: "cover", display: "block",
+            transform: "translateZ(0)",        // GPU layer
+            willChange: "transform",           // hint to browser
           }}
         />
 
-        {/* Scroll hint — fades out as you scroll */}
-        <div style={{
-          position: "absolute", bottom: 40, left: "50%", transform: "translateX(-50%)",
+        {/* Scroll hint */}
+        <div ref={hintRef} style={{
+          position: "absolute", bottom: 44, left: "50%",
+          transform: "translateX(-50%)",
           display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
-          animation: "kzPulse 2s ease-in-out infinite",
           pointerEvents: "none",
+          transition: "opacity 0.4s ease",
+          animation: "kzFloat 2s ease-in-out infinite",
         }}>
-          <span style={{ fontFamily: "Rajdhani, sans-serif", fontWeight: 700, fontSize: "0.72rem", letterSpacing: "0.26em", textTransform: "uppercase", color: "rgba(0,247,255,0.6)" }}>
-            Scroll to enter
-          </span>
-          <svg width="18" height="28" viewBox="0 0 18 28" fill="none">
-            <rect x="1" y="1" width="16" height="22" rx="8" stroke="rgba(0,247,255,0.4)" strokeWidth="1.5" />
-            <rect x="7.5" y="5" width="3" height="6" rx="1.5" fill="rgba(0,247,255,0.7)">
-              <animate attributeName="y" values="5;11;5" dur="1.6s" repeatCount="indefinite" />
-              <animate attributeName="opacity" values="1;0.2;1" dur="1.6s" repeatCount="indefinite" />
-            </rect>
-            <path d="M6 26l3 3 3-3" stroke="rgba(0,247,255,0.4)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <span style={{
+            fontFamily: "Rajdhani, sans-serif", fontWeight: 700,
+            fontSize: "0.7rem", letterSpacing: "0.28em",
+            textTransform: "uppercase", color: "rgba(0,247,255,0.55)",
+          }}>Scroll to enter</span>
+          <svg width="20" height="32" viewBox="0 0 20 32" fill="none">
+            <rect x="1" y="1" width="18" height="26" rx="9" stroke="rgba(0,247,255,0.35)" strokeWidth="1.5"/>
+            <circle cx="10" cy="9" r="2.5" fill="rgba(0,247,255,0.7)">
+              <animate attributeName="cy" values="9;17;9" dur="1.6s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0;1" dur="1.6s" repeatCount="indefinite"/>
+            </circle>
+            <polyline points="7,29 10,32 13,29" fill="none" stroke="rgba(0,247,255,0.35)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
 
-        {/* Blend overlay — fades to site background at end of scroll */}
+        {/* Blend overlay — transparent → site bg */}
         <div ref={overlayRef} style={{
           position: "absolute", inset: 0,
-          background: "linear-gradient(to bottom, transparent 0%, #05070c 60%)",
+          background: "linear-gradient(to bottom, rgba(5,7,12,0) 0%, #05070c 65%)",
           opacity: 0,
           pointerEvents: "none",
-          transition: "opacity 0.05s linear",
-        }} />
+        }}/>
       </div>
 
       <style>{`
-        @keyframes kzPulse {
-          0%, 100% { opacity: 0.9; transform: translateX(-50%) translateY(0); }
-          50%       { opacity: 0.4; transform: translateX(-50%) translateY(6px); }
+        @keyframes kzFloat {
+          0%, 100% { transform: translateX(-50%) translateY(0px); }
+          50%       { transform: translateX(-50%) translateY(8px); }
         }
       `}</style>
     </div>
