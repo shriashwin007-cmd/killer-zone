@@ -1,11 +1,17 @@
 "use client";
 import { useEffect, useRef } from "react";
 
-const VIDEO_URL =
+// Desktop gets a crisp 1280px source; phones get a much lighter 640px / eco
+// source so each scrubbed frame decodes fast enough to feel smooth on touch.
+const VIDEO_DESKTOP =
   "https://res.cloudinary.com/dxvui0xkz/video/upload/q_auto:good,w_1280,c_limit/v1781549761/Killer_Zone_logo_animation_202606151758_aiux2e.mp4";
+const VIDEO_MOBILE =
+  "https://res.cloudinary.com/dxvui0xkz/video/upload/q_auto:eco,w_640,c_limit/v1781549761/Killer_Zone_logo_animation_202606151758_aiux2e.mp4";
 
-// How many screen-heights the user scrolls to watch the full video
-const SCROLL_MULTIPLIER = 3;
+const isMobileDevice = () =>
+  typeof window !== "undefined" &&
+  (window.matchMedia("(max-width: 768px)").matches ||
+    window.matchMedia("(pointer: coarse)").matches);
 
 export default function ScrollVideoIntro() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -28,16 +34,27 @@ export default function ScrollVideoIntro() {
     const hint      = hintRef.current;
     if (!video || !canvas || !container || !overlay) return;
 
+    const mobile = isMobileDevice();
+
+    // Shorter scroll travel on phones (less finger distance = feels snappier),
+    // longer on desktop where wheel scroll has more resolution.
+    const multiplier = mobile ? 1.8 : 3;
+    container.style.height = `${multiplier * 100}vh`;
+
+    // Pick the right source for this device & (re)load it
+    video.src = mobile ? VIDEO_MOBILE : VIDEO_DESKTOP;
+
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     video.pause();
 
-    // ── resize canvas to device pixels ──────────────────────────────────────
+    // ── resize canvas to device pixels (cap DPR on mobile to save fill-rate) ─
     const resize = () => {
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = Math.min(window.devicePixelRatio || 1, mobile ? 2 : 3);
       canvas.width  = canvas.offsetWidth  * dpr;
       canvas.height = canvas.offsetHeight * dpr;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
       drawFrame();
     };
@@ -124,16 +141,15 @@ export default function ScrollVideoIntro() {
   return (
     <div
       ref={containerRef}
-      style={{ height: `${SCROLL_MULTIPLIER * 100}vh`, position: "relative" }}
+      style={{ height: "300vh", position: "relative" }}
     >
       <div style={{
-        position: "sticky", top: 0, height: "100vh",
+        position: "sticky", top: 0, height: "100svh",
         overflow: "hidden", background: "#000",
       }}>
-        {/* hidden video — only used as decode source */}
+        {/* hidden video — only used as decode source (src set per-device in effect) */}
         <video
           ref={videoRef}
-          src={VIDEO_URL}
           muted playsInline preload="auto"
           style={{ display: "none" }}
         />

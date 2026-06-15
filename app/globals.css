@@ -10,9 +10,14 @@
   --line: rgba(255, 255, 255, 0.1);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-html { scroll-behavior: smooth; color-scheme: dark; }
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
 
 body {
   font-family: "Poppins", system-ui, sans-serif;
@@ -24,6 +29,9 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Allow native momentum scroll & avoid accidental horizontal pan on mobile */
+body { touch-action: pan-y; }
 
 /* Animated grid overlay */
 body::before {
@@ -103,4 +111,63 @@ body::before {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   TABLET  (≤ 860px)
+   ────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .wrap { width: min(1160px, calc(100% - 28px)); }
+
+  /* Tighter vertical rhythm so sections aren't huge on small screens */
+  section[id="rooms"],
+  section[id="add-ons"],
+  section[id="gallery"],
+  section[id="pricing"],
+  section[id="book"],
+  section[id="location"] {
+    padding-top: 56px !important;
+    padding-bottom: 56px !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   PHONE  (≤ 600px)
+   ────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .wrap { width: calc(100% - 24px); }
+
+  section[id="rooms"],
+  section[id="add-ons"],
+  section[id="gallery"],
+  section[id="pricing"],
+  section[id="book"],
+  section[id="location"] {
+    padding-top: 44px !important;
+    padding-bottom: 44px !important;
+  }
+
+  /* Calmer animated grid + smaller cells on phones */
+  body::before { background-size: 38px 38px; opacity: 0.6; }
+  @keyframes gridScroll {
+    from { transform: translateY(0); }
+    to   { transform: translateY(38px); }
+  }
+
+  /* Lighter glass blur — heavy backdrop-filter is costly on mobile GPUs */
+  .glass {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.32);
+  }
+
+  /* Default comfortable mobile body size */
+  body { font-size: 15px; }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   TOUCH DEVICES — neutralise sticky :hover lift that traps the first tap
+   ────────────────────────────────────────────────────────────────────────── */
+@media (hover: none) {
+  .glass { transition: none; }
 }

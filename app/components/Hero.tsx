@@ -84,11 +84,20 @@ export default function Hero({ onChatOpen }: { onChatOpen: () => void }) {
 
       <style>{`
         @media (max-width: 860px) {
+          #home { padding-top: calc(82px + env(safe-area-inset-top, 0px)) !important; padding-bottom: 40px !important; }
           #home .wrap { grid-template-columns: 1fr !important; }
-          #home .wrap > div:last-child { order: -1; min-height: 280px !important; }
+          #home .wrap > div:last-child { order: -1; min-height: 260px !important; }
         }
-        @media (max-width: 520px) {
+        @media (max-width: 600px) {
+          /* Stats: 2 columns on phones */
           #home .wrap > div:first-child > div:last-child { grid-template-columns: repeat(2,1fr) !important; }
+          /* CTA buttons go full width and stack for easy thumb taps */
+          #home .wrap > div:first-child > div:nth-of-type(2) { flex-direction: column !important; }
+          #home .wrap > div:first-child > div:nth-of-type(2) > a,
+          #home .wrap > div:first-child > div:nth-of-type(2) > button {
+            width: 100% !important; justify-content: center !important;
+          }
+          #home .wrap > div:last-child { min-height: 220px !important; }
         }
       `}</style>
     </section>

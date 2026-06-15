@@ -127,6 +127,17 @@ export default function Navbar({ onChatOpen }: { onChatOpen: () => void }) {
           .desktop-nav { display: none !important; }
           .hamburger { display: grid !important; }
         }
+        @media (max-width: 600px) {
+          header .wrap { min-height: 60px !important; }
+          /* Smaller logo on phones */
+          header .wrap > a:first-child img { height: 38px !important; }
+          /* Tighten brand title */
+          header .wrap > a:first-child > div > div:first-child { font-size: 0.92rem !important; }
+        }
+        @media (max-width: 380px) {
+          /* Hide the small subtitle on very narrow phones to avoid wrapping */
+          header .wrap > a:first-child > div > div:last-child { display: none !important; }
+        }
       `}</style>
     </header>
   );
