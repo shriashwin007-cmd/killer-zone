@@ -41,9 +41,10 @@ Keep replies to 1-2 sentences. Be enthusiastic, friendly, and use casual gaming 
         : "Let me help you with that!";
 
     return NextResponse.json({ reply: text });
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.error("Chat API error:", msg);
-    return NextResponse.json({ reply: `[debug] ${msg}` });
+  } catch (err) {
+    console.error("Chat API error:", err);
+    return NextResponse.json({
+      reply: "I'm having a connection issue right now. For instant help, WhatsApp us at +91 73585 46431! 💬",
+    });
   }
 }
