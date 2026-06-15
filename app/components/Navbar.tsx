@@ -26,12 +26,17 @@ export default function Navbar({ onChatOpen }: { onChatOpen: () => void }) {
 
         {/* Brand */}
         <a href="#home" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{
-            width: 42, height: 42, borderRadius: 12,
-            background: "linear-gradient(135deg, #00f7ff, #8a5cff)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "1.4rem",
-          }}>🎮</div>
+          <img
+            src="https://res.cloudinary.com/dxvui0xkz/image/upload/v1781549406/killer_zone_logo_vzgm7t.jpg"
+            alt="Killer Zone"
+            style={{
+              height: 48, width: "auto",
+              borderRadius: 10,
+              mixBlendMode: "screen",
+              filter: "drop-shadow(0 0 10px rgba(0,247,255,0.35))",
+              objectFit: "contain",
+            }}
+          />
           <div>
             <div style={{ fontFamily: "Orbitron, sans-serif", fontWeight: 900, fontSize: "1rem", letterSpacing: "0.1em", color: "#f8fbff" }}>
               KILLER ZONE
