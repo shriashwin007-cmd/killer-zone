@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useRef } from "react";
 
 const STATS = [
   { value: "PS5", label: "4K displays" },
@@ -8,13 +9,23 @@ const STATS = [
 ];
 
 export default function Hero({ onChatOpen }: { onChatOpen: () => void }) {
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (!imgRef.current) return;
+      imgRef.current.style.transform = `translateY(${window.scrollY * 0.18}px)`;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <section id="home" style={{ minHeight: "100svh", display: "grid", alignItems: "center", paddingTop: "calc(90px + env(safe-area-inset-top, 0px))", paddingBottom: 56, position: "relative", zIndex: 1 }}>
       <div className="wrap" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(2rem,5vw,4rem)", alignItems: "center" }}>
 
         {/* Left */}
         <div>
-          {/* Pill */}
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 999, border: "1px solid rgba(0,247,255,0.3)", background: "rgba(0,247,255,0.07)", marginBottom: 18 }}>
             <span className="pulse-dot" />
             <span style={{ fontFamily: "Rajdhani, sans-serif", fontWeight: 700, fontSize: "0.76rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "#00f7ff" }}>
@@ -22,18 +33,15 @@ export default function Hero({ onChatOpen }: { onChatOpen: () => void }) {
             </span>
           </div>
 
-          {/* Heading */}
           <h1 style={{ fontFamily: "Orbitron, sans-serif", fontWeight: 900, fontSize: "clamp(3rem,7vw,5.6rem)", lineHeight: 0.96, marginBottom: 18 }}>
             Enter the{" "}
             <span className="grad">Killer Zone</span>
           </h1>
 
-          {/* Copy */}
           <p style={{ color: "rgba(248,251,255,0.65)", fontSize: "clamp(1rem,1.6vw,1.14rem)", lineHeight: 1.72, maxWidth: 560, marginBottom: 28 }}>
             A cinematic PS5 lounge built for squad nights, birthdays, dates, and serious gaming sessions. Choose a themed room, settle into the neon, and press start.
           </p>
 
-          {/* CTA row */}
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 32 }}>
             <a href="#book" style={{ display: "inline-flex", alignItems: "center", gap: 8, minHeight: 48, padding: "0 22px", borderRadius: 14, fontWeight: 800, textDecoration: "none", color: "#021014", background: "linear-gradient(135deg,#00f7ff,#8a5cff)", boxShadow: "0 16px 44px rgba(0,247,255,0.24)" }}>
               🎮 Reserve a Slot
@@ -46,7 +54,6 @@ export default function Hero({ onChatOpen }: { onChatOpen: () => void }) {
             </a>
           </div>
 
-          {/* Stats grid */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
             {STATS.map((s) => (
               <div key={s.value} className="glass" style={{ borderRadius: 14, padding: "14px 12px" }}>
@@ -57,15 +64,30 @@ export default function Hero({ onChatOpen }: { onChatOpen: () => void }) {
           </div>
         </div>
 
-        {/* Right – placeholder for Cloudinary hero image */}
-        <div className="glass img-placeholder" style={{ borderRadius: 24, minHeight: 500, flexDirection: "column", gap: 12 }}>
-          <span style={{ fontSize: "3rem" }}>🎮</span>
-          <span>Hero image coming soon</span>
-          <span style={{ fontSize: "0.7rem", opacity: 0.5 }}>Replace with Cloudinary URL</span>
+        {/* Right – parallax hero image */}
+        <div style={{ borderRadius: 24, overflow: "hidden", minHeight: 500, position: "relative", border: "1px solid rgba(0,247,255,0.22)", boxShadow: "0 0 80px rgba(0,247,255,0.1), 0 0 120px rgba(138,92,255,0.06)" }}>
+          <img
+            ref={imgRef}
+            src="https://res.cloudinary.com/dxvui0xkz/image/upload/v1781542712/gaming_lounge_setup_1_kigpow.png"
+            alt="Killer Zone Gaming Lounge"
+            style={{
+              position: "absolute",
+              top: "-20%",
+              left: 0,
+              width: "100%",
+              height: "140%",
+              objectFit: "cover",
+              willChange: "transform",
+              transition: "transform 0.08s linear",
+            }}
+          />
+          {/* Bottom fade */}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 55%, rgba(2,7,20,0.72) 100%)", pointerEvents: "none" }} />
+          {/* Neon colour wash */}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(0,247,255,0.07) 0%, transparent 50%, rgba(138,92,255,0.07) 100%)", pointerEvents: "none" }} />
         </div>
       </div>
 
-      {/* Responsive stacking */}
       <style>{`
         @media (max-width: 860px) {
           #home .wrap { grid-template-columns: 1fr !important; }
