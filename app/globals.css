@@ -106,6 +106,23 @@ body::before {
   text-transform: uppercase;
 }
 
+/* Add-on card animations (shared by section + menu pages) */
+@keyframes floatUp {
+  0%   { transform: translateY(0)    scale(1); opacity: 0.9; }
+  100% { transform: translateY(-80px) scale(0); opacity: 0; }
+}
+@keyframes shake {
+  0%,100% { transform: rotate(0deg)  scale(1.08); }
+  20%     { transform: rotate(-8deg) scale(1.14); }
+  40%     { transform: rotate(8deg)  scale(1.14); }
+  60%     { transform: rotate(-5deg) scale(1.1); }
+  80%     { transform: rotate(5deg)  scale(1.1); }
+}
+@keyframes burstFly {
+  0%   { transform: translate(0, 0)                  scale(1); opacity: 1; }
+  100% { transform: translate(var(--vx), var(--vy))  scale(0); opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

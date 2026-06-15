@@ -44,9 +44,9 @@ export default function ScrollVideoIntro() {
     if (!ctx) return;
 
     const mobile      = isMobileDevice();
-    const FRAME_COUNT = mobile ? 40 : 64;
+    const FRAME_COUNT = mobile ? 48 : 72;   // more frames = finer, smoother scrub
     const FRAME_W     = mobile ? 720 : 1280;
-    const multiplier  = mobile ? 1.8 : 2.6;
+    const multiplier  = mobile ? 3.2 : 4.5; // longer scroll = slower playback
     container.style.height = `${multiplier * 100}vh`;
 
     let cancelled = false;
