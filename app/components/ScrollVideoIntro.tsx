@@ -1,12 +1,21 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-// Desktop gets a crisp 1280px source; phones get a much lighter 640px / eco
-// source so each scrubbed frame decodes fast enough to feel smooth on touch.
-const VIDEO_DESKTOP =
-  "https://res.cloudinary.com/dxvui0xkz/video/upload/q_auto:good,w_1280,c_limit/v1781549761/Killer_Zone_logo_animation_202606151758_aiux2e.mp4";
-const VIDEO_MOBILE =
-  "https://res.cloudinary.com/dxvui0xkz/video/upload/q_auto:eco,w_640,c_limit/v1781549761/Killer_Zone_logo_animation_202606151758_aiux2e.mp4";
+/*
+  Apple-style scroll sequence.
+  Instead of seeking a <video> (which re-decodes every frame and stutters),
+  we use Cloudinary to extract individual JPG frames, preload them ALL as
+  decoded <img> objects, then just drawImage() the right frame on scroll.
+  Swapping pre-decoded images is instant → true 60fps scrubbing, no glitch.
+*/
+
+const BASE      = "https://res.cloudinary.com/dxvui0xkz/video/upload";
+const PUBLIC_ID = "v1781549761/Killer_Zone_logo_animation_202606151758_aiux2e";
+const MP4_META  = `${BASE}/q_auto/${PUBLIC_ID}.mp4`; // only used to read duration
+
+// One extracted frame at time t (seconds), width w
+const frameUrl = (t: number, w: number) =>
+  `${BASE}/so_${t.toFixed(2)},w_${w},c_limit,q_auto/${PUBLIC_ID}.jpg`;
 
 const isMobileDevice = () =>
   typeof window !== "undefined" &&
@@ -16,92 +25,71 @@ const isMobileDevice = () =>
 export default function ScrollVideoIntro() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef    = useRef<HTMLCanvasElement>(null);
-  const videoRef     = useRef<HTMLVideoElement>(null);
   const overlayRef   = useRef<HTMLDivElement>(null);
   const hintRef      = useRef<HTMLDivElement>(null);
 
-  const targetTime   = useRef(0);
-  const isSeeking    = useRef(false);
-  const nextTime     = useRef<number | null>(null);
+  const frames       = useRef<HTMLImageElement[]>([]);
+  const currentFrame = useRef(-1);
   const ticking      = useRef(false);
-  const rafId        = useRef<number | null>(null);
+  const [progress, setProgress] = useState(0); // preload progress 0..1
 
   useEffect(() => {
-    const video     = videoRef.current;
     const canvas    = canvasRef.current;
     const container = containerRef.current;
     const overlay   = overlayRef.current;
     const hint      = hintRef.current;
-    if (!video || !canvas || !container || !overlay) return;
+    if (!canvas || !container || !overlay) return;
 
-    const mobile = isMobileDevice();
-
-    // Shorter scroll travel on phones (less finger distance = feels snappier),
-    // longer on desktop where wheel scroll has more resolution.
-    const multiplier = mobile ? 1.8 : 3;
-    container.style.height = `${multiplier * 100}vh`;
-
-    // Pick the right source for this device & (re)load it
-    video.src = mobile ? VIDEO_MOBILE : VIDEO_DESKTOP;
-
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
 
-    video.pause();
+    const mobile      = isMobileDevice();
+    const FRAME_COUNT = mobile ? 40 : 64;
+    const FRAME_W     = mobile ? 720 : 1280;
+    const multiplier  = mobile ? 1.8 : 2.6;
+    container.style.height = `${multiplier * 100}vh`;
 
-    // ── resize canvas to device pixels (cap DPR on mobile to save fill-rate) ─
-    const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, mobile ? 2 : 3);
-      canvas.width  = canvas.offsetWidth  * dpr;
-      canvas.height = canvas.offsetHeight * dpr;
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.scale(dpr, dpr);
-      drawFrame();
-    };
+    let cancelled = false;
+    let loaded    = 0;
 
-    // ── object-cover draw ────────────────────────────────────────────────────
-    const drawFrame = () => {
-      if (!video.videoWidth) return;
-      const vw = video.videoWidth, vh = video.videoHeight;
-      const cw = canvas.offsetWidth,  ch = canvas.offsetHeight;
-      const vRatio = vw / vh, cRatio = cw / ch;
+    // ── object-cover draw of a decoded image ────────────────────────────────
+    const draw = (img: HTMLImageElement) => {
+      const cw = canvas.offsetWidth, ch = canvas.offsetHeight;
+      const vw = img.naturalWidth,   vh = img.naturalHeight;
+      if (!vw || !ch) return;
+      const vR = vw / vh, cR = cw / ch;
       let sx = 0, sy = 0, sw = vw, sh = vh;
-      if (vRatio > cRatio) { sw = vh * cRatio; sx = (vw - sw) / 2; }
-      else                 { sh = vw / cRatio; sy = (vh - sh) / 2; }
-      ctx.clearRect(0, 0, cw, ch);
-      ctx.drawImage(video, sx, sy, sw, sh, 0, 0, cw, ch);
+      if (vR > cR) { sw = vh * cR; sx = (vw - sw) / 2; }
+      else         { sh = vw / cR; sy = (vh - sh) / 2; }
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
     };
 
-    // ── seek queue — one seek in flight at a time ────────────────────────────
-    const flushSeek = (t: number) => {
-      isSeeking.current = true;
-      video.currentTime = t;
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width  = Math.round(canvas.offsetWidth  * dpr);
+      canvas.height = Math.round(canvas.offsetHeight * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const f = frames.current[Math.max(0, currentFrame.current)];
+      if (f && f.complete && f.naturalWidth) draw(f);
     };
 
-    const seekTo = (t: number) => {
-      if (isSeeking.current) { nextTime.current = t; return; }
-      flushSeek(t);
-    };
+    // ── render the frame matching scroll position ───────────────────────────
+    const render = () => {
+      const rect       = container.getBoundingClientRect();
+      const scrollable = container.offsetHeight - window.innerHeight;
+      const p          = Math.min(1, Math.max(0, -rect.top) / scrollable);
 
-    const onSeeked = () => {
-      drawFrame();
-      isSeeking.current = false;
-      if (nextTime.current !== null) {
-        const t = nextTime.current;
-        nextTime.current = null;
-        flushSeek(t);
+      const idx = Math.min(FRAME_COUNT - 1, Math.round(p * (FRAME_COUNT - 1)));
+      if (idx !== currentFrame.current) {
+        const img = frames.current[idx];
+        if (img && img.complete && img.naturalWidth) {
+          draw(img);
+          currentFrame.current = idx;
+        }
       }
-    };
 
-    // ── scroll → progress ────────────────────────────────────────────────────
-    const commit = () => {
-      seekTo(targetTime.current);
-
-      // overlay blend in last 30%
-      const p     = container.offsetHeight > window.innerHeight
-        ? Math.min(1, Math.max(0, -container.getBoundingClientRect().top) / (container.offsetHeight - window.innerHeight))
-        : 0;
-      const FADE  = 0.72;
+      // blend to site background in the last stretch
+      const FADE  = 0.8;
       const raw   = p > FADE ? (p - FADE) / (1 - FADE) : 0;
       const eased = raw < 0.5 ? 2 * raw * raw : 1 - Math.pow(-2 * raw + 2, 2) / 2;
       overlay.style.opacity = String(eased);
@@ -111,50 +99,58 @@ export default function ScrollVideoIntro() {
     };
 
     const onScroll = () => {
-      const rect       = container.getBoundingClientRect();
-      const scrollable = container.offsetHeight - window.innerHeight;
-      const p          = Math.min(1, Math.max(0, -rect.top) / scrollable);
-      if (video.duration) targetTime.current = p * video.duration;
-
       if (!ticking.current) {
         ticking.current = true;
-        rafId.current = requestAnimationFrame(commit);
+        requestAnimationFrame(render);
       }
     };
 
-    video.addEventListener("seeked",       onSeeked);
-    video.addEventListener("loadeddata",   () => { resize(); drawFrame(); });
-    window.addEventListener("scroll",      onScroll, { passive: true });
-    window.addEventListener("resize",      resize);
+    // ── build frame list (needs duration) then preload everything ───────────
+    const buildFrames = (duration: number) => {
+      const safeDur = Math.max(0.1, duration - 0.05);
+      const imgs: HTMLImageElement[] = new Array(FRAME_COUNT);
+      for (let i = 0; i < FRAME_COUNT; i++) {
+        const t   = (i / (FRAME_COUNT - 1)) * safeDur;
+        const img = new Image();
+        img.decoding = "async";
+        img.onload = () => {
+          loaded++;
+          if (!cancelled) setProgress(loaded / FRAME_COUNT);
+          if (i === 0) { resize(); draw(img); currentFrame.current = 0; }
+        };
+        // No crossOrigin: we only drawImage (never read pixels), so a tainted
+        // canvas is fine and we avoid any CORS load failures.
+        img.src = frameUrl(t, FRAME_W);
+        imgs[i] = img;
+      }
+      frames.current = imgs;
+    };
 
-    // draw first frame immediately if already loaded
-    if (video.readyState >= 2) { resize(); drawFrame(); }
+    const meta = document.createElement("video");
+    meta.preload = "metadata";
+    meta.muted   = true;
+    meta.onloadedmetadata = () => { if (!cancelled) buildFrames(meta.duration || 5); };
+    meta.onerror          = () => { if (!cancelled) buildFrames(5); }; // fallback
+    meta.src = MP4_META;
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", resize);
+    resize();
 
     return () => {
-      video.removeEventListener("seeked",     onSeeked);
-      window.removeEventListener("scroll",    onScroll);
-      window.removeEventListener("resize",    resize);
-      if (rafId.current) cancelAnimationFrame(rafId.current);
+      cancelled = true;
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", resize);
     };
   }, []);
 
   return (
-    <div
-      ref={containerRef}
-      style={{ height: "300vh", position: "relative" }}
-    >
+    <div ref={containerRef} style={{ height: "260vh", position: "relative" }}>
       <div style={{
         position: "sticky", top: 0, height: "100svh",
         overflow: "hidden", background: "#000",
       }}>
-        {/* hidden video — only used as decode source (src set per-device in effect) */}
-        <video
-          ref={videoRef}
-          muted playsInline preload="auto"
-          style={{ display: "none" }}
-        />
-
-        {/* canvas renders every confirmed frame — no tearing */}
+        {/* canvas draws the current pre-decoded frame */}
         <canvas
           ref={canvasRef}
           style={{
@@ -162,6 +158,32 @@ export default function ScrollVideoIntro() {
             width: "100%", height: "100%", display: "block",
           }}
         />
+
+        {/* preload progress bar (shows until frames are ready) */}
+        {progress < 1 && (
+          <div style={{
+            position: "absolute", left: "50%", top: "50%",
+            transform: "translate(-50%,-50%)",
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
+            pointerEvents: "none",
+          }}>
+            <div style={{
+              width: 160, height: 3, borderRadius: 999,
+              background: "rgba(255,255,255,0.12)", overflow: "hidden",
+            }}>
+              <div style={{
+                width: `${Math.round(progress * 100)}%`, height: "100%",
+                background: "linear-gradient(90deg,#00f7ff,#8a5cff)",
+                transition: "width .2s ease",
+              }} />
+            </div>
+            <span style={{
+              fontFamily: "Rajdhani, sans-serif", fontWeight: 700,
+              fontSize: "0.68rem", letterSpacing: "0.26em",
+              textTransform: "uppercase", color: "rgba(0,247,255,0.5)",
+            }}>Loading</span>
+          </div>
+        )}
 
         {/* scroll hint */}
         <div ref={hintRef} style={{
