@@ -3,9 +3,6 @@ export type Item = {
 };
 
 export const BEVERAGES: Item[] = [
-  { id: "bev1",  name: "Tropicana Pomegranate", price: 60,  icon: "🍹", label: "₹60",  desc: "Tropicana Pomegranate Delight juice.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781540842/tropicana_pomegranate_delight_pkxqxj.jpg" },
-  { id: "bev2",  name: "Tropicana Orange",      price: 60,  icon: "🍊", label: "₹60",  desc: "Tropicana Orange Delight juice.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781540841/tropicana_orange_delight_vlgv9k.jpg" },
-  { id: "bev3",  name: "Tropicana Litchi",      price: 60,  icon: "🍈", label: "₹60",  desc: "Tropicana Litchi Delight juice.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781540840/tropicana_litchi_delight_cxkldh.jpg" },
   { id: "bev4",  name: "Thums Up",              price: 50,  icon: "🥤", label: "₹50",  desc: "Classic strong cola — Thums Up.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781540839/thums_up_cbez4j.jpg" },
   { id: "bev5",  name: "Sprite",                price: 50,  icon: "🥤", label: "₹50",  desc: "Refreshing lemon-lime Sprite.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781540838/sprite_fbku0t.jpg" },
   { id: "bev6",  name: "Slice Mango",           price: 55,  icon: "🥭", label: "₹55",  desc: "Slice Pure Mango Pleasure drink.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781540838/slice_pure_mango_pleasure_m98k3d.jpg" },
