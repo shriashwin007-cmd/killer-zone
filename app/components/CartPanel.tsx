@@ -23,7 +23,7 @@ export default function CartPanel() {
     if (!cart.length) { show("Your cart is empty!"); return; }
     const lines = cart.map((i) => `${i.quantity}x ${i.name} – ₹${i.price * i.quantity}`).join("\n");
     const msg = `Hi Killer Zone! I want to order:\n\n${lines}\n\nTotal: ₹${totalPrice}`;
-    window.open(`https://wa.me/917358546431?text=${encodeURIComponent(msg)}`, "_blank", "noopener,noreferrer");
+    window.open(`https://wa.me/919444409996?text=${encodeURIComponent(msg)}`, "_blank", "noopener,noreferrer");
   }
 
   async function handlePayment() {
@@ -69,7 +69,7 @@ export default function CartPanel() {
           cart.forEach((item) => removeItem(item.id));
           closeCart();
           const msg = `Hi! I just paid for:\n${cart.map((i) => `${i.quantity}x ${i.name}`).join(", ")}\nPayment ID: ${response.razorpay_payment_id}`;
-          window.open(`https://wa.me/917358546431?text=${encodeURIComponent(msg)}`, "_blank", "noopener,noreferrer");
+          window.open(`https://wa.me/919444409996?text=${encodeURIComponent(msg)}`, "_blank", "noopener,noreferrer");
         },
       };
 

@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 type Msg = { role: "assistant" | "user"; text: string };
 
 const SUGGESTIONS = [
-  "Can 4 friends get consoles together?",
+  "Which room is best for 4 friends?",
   "What's the pricing?",
   "Plan a birthday session",
 ];
@@ -45,7 +45,7 @@ export default function ChatWidget({ isOpen, onClose }: { isOpen: boolean; onClo
         ...p,
         {
           role: "assistant",
-          text: "Connection issue — WhatsApp us at +91 73585 46431 for instant help! 💬",
+          text: "Connection issue — WhatsApp us at +91 94444 09996 for instant help! 💬",
         },
       ]);
     } finally {

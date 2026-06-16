@@ -49,10 +49,11 @@ const localBusinessJsonLd = {
   name: "Killer Zone",
   description: "Premium PS5 gaming centre and lounge in Chennai.",
   url: SITE_URL,
-  telephone: "+91 73585 46431",
+  telephone: "+91 94444 09996",
   priceRange: "₹₹",
   address: {
     "@type": "PostalAddress",
+    streetAddress: "G-55, First Main Road, Anna Nagar East",
     addressLocality: "Chennai",
     addressRegion: "Tamil Nadu",
     addressCountry: "IN",

@@ -11,7 +11,7 @@ export default function FloatActions({ onChatOpen }: { onChatOpen: () => void })
         boxShadow: "0 16px 44px rgba(0,0,0,0.3)",
       }}>🤖 AI Chat</button>
 
-      <a href="https://wa.me/917358546431?text=Hi%20Killer%20Zone!%20I%20want%20to%20book%20a%20gaming%20session." target="_blank" rel="noreferrer" style={{
+      <a href="https://wa.me/919444409996?text=Hi%20Killer%20Zone!%20I%20want%20to%20book%20a%20gaming%20session." target="_blank" rel="noreferrer" style={{
         display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
         minHeight: 50, minWidth: 150, padding: "0 18px", borderRadius: 16,
         background: "#25d366", color: "#03120a",

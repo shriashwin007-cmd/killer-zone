@@ -105,7 +105,7 @@ export default function Booking() {
 
   function whatsappSubmit() {
     saveBooking(); // Save as pending
-    window.open(`https://wa.me/917358546431?text=${encodeURIComponent(buildWhatsAppMsg())}`, "_blank", "noopener,noreferrer");
+    window.open(`https://wa.me/919444409996?text=${encodeURIComponent(buildWhatsAppMsg())}`, "_blank", "noopener,noreferrer");
   }
 
   async function handlePayment(e: FormEvent) {
@@ -141,7 +141,7 @@ export default function Booking() {
         handler: async (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) => {
           await saveBooking(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature);
           show(`✅ Booking confirmed! Ref: ${response.razorpay_payment_id.slice(-8).toUpperCase()}`);
-          window.open(`https://wa.me/917358546431?text=${encodeURIComponent(buildWhatsAppMsg(response.razorpay_payment_id))}`, "_blank", "noopener,noreferrer");
+          window.open(`https://wa.me/919444409996?text=${encodeURIComponent(buildWhatsAppMsg(response.razorpay_payment_id))}`, "_blank", "noopener,noreferrer");
         },
       });
       rzp.on("payment.failed", () => show("Payment failed. Please try again."));

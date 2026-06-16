@@ -46,7 +46,7 @@ export default function Hero({ onChatOpen }: { onChatOpen: () => void }) {
             <button onClick={onChatOpen} style={{ display: "inline-flex", alignItems: "center", gap: 8, minHeight: 48, padding: "0 22px", borderRadius: 14, fontWeight: 800, border: "1px solid rgba(0,247,255,0.44)", background: "rgba(0,247,255,0.04)", color: "#00f7ff", cursor: "pointer", fontFamily: "inherit" }}>
               🤖 Ask KZ Assist
             </button>
-            <a href="https://wa.me/917358546431?text=Hi%20Killer%20Zone!%20I%20want%20to%20book." target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 8, minHeight: 48, padding: "0 22px", borderRadius: 14, fontWeight: 800, textDecoration: "none", color: "#03120a", background: "#25d366", boxShadow: "0 14px 40px rgba(37,211,102,0.22)" }}>
+            <a href="https://wa.me/919444409996?text=Hi%20Killer%20Zone!%20I%20want%20to%20book." target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 8, minHeight: 48, padding: "0 22px", borderRadius: 14, fontWeight: 800, textDecoration: "none", color: "#03120a", background: "#25d366", boxShadow: "0 14px 40px rgba(37,211,102,0.22)" }}>
               💬 WhatsApp
             </a>
           </div>

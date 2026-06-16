@@ -9,16 +9,16 @@ export default function Location() {
             Killer Zone Chennai
           </h2>
           {[
-            { label: "Phone",   content: <a href="tel:917358546431" style={{ color: "rgba(248,251,255,0.65)", textDecoration: "none" }}>+91 73585 46431</a> },
+            { label: "Phone",   content: <a href="tel:919444409996" style={{ color: "rgba(248,251,255,0.65)", textDecoration: "none" }}>+91 94444 09996</a> },
             { label: "Hours",   content: <span style={{ color: "rgba(248,251,255,0.65)" }}>Open Daily · 11:00 AM – 12:00 AM</span> },
-            { label: "Address", content: <span style={{ color: "rgba(248,251,255,0.65)" }}>Killer Zone Gaming, Chennai, Tamil Nadu, India</span> },
+            { label: "Address", content: <span style={{ color: "rgba(248,251,255,0.65)" }}>G-55, First Main Road, Anna Nagar East, Chennai, Tamil Nadu</span> },
           ].map((r) => (
             <div key={r.label} style={{ padding: "14px 0", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
               <small style={{ display: "block", fontFamily: "Rajdhani, sans-serif", fontWeight: 800, fontSize: "0.72rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "#00f7ff", marginBottom: 4 }}>{r.label}</small>
               {r.content}
             </div>
           ))}
-          <a href="https://maps.google.com/?q=Killer+Zone+Gaming+Chennai" target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 20, minHeight: 44, padding: "0 20px", borderRadius: 12, border: "1px solid rgba(0,247,255,0.44)", background: "rgba(0,247,255,0.04)", color: "#00f7ff", fontWeight: 800, textDecoration: "none" }}>
+          <a href="https://maps.google.com/?q=Killer+Zone+G-55+First+Main+Road+Anna+Nagar+East+Chennai" target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 20, minHeight: 44, padding: "0 20px", borderRadius: 12, border: "1px solid rgba(0,247,255,0.44)", background: "rgba(0,247,255,0.04)", color: "#00f7ff", fontWeight: 800, textDecoration: "none" }}>
             🗺️ Get Directions
           </a>
         </div>
@@ -29,7 +29,7 @@ export default function Location() {
           title="Killer Zone location"
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3886.5!2d80.2182!3d13.0679!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5265ea4f7d3361%3A0x6e61a70b6863d433!2sNelson%20Manickam%20Rd%2C%20Chennai%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1710000000000"
+          src="https://maps.google.com/maps?q=G-55%2C%20First%20Main%20Road%2C%20Anna%20Nagar%20East%2C%20Chennai&t=&z=15&ie=UTF8&iwloc=&output=embed"
         />
       </div>
       <style>{`

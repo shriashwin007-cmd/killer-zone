@@ -27,7 +27,7 @@ export default function Navbar({ onChatOpen }: { onChatOpen: () => void }) {
         {/* Brand */}
         <a href="#home" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
           <img
-            src="https://res.cloudinary.com/dxvui0xkz/image/upload/v1781549406/killer_zone_logo_vzgm7t.jpg"
+            src="https://res.cloudinary.com/dxvui0xkz/image/upload/v1781594936/killer_zone_logo_q1woon.jpg"
             alt="Killer Zone"
             style={{
               height: 48, width: "auto",
