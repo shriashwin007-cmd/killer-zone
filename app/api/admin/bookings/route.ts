@@ -1,12 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/app/lib/supabase";
+import { rateLimit, clientIp } from "@/app/lib/rateLimit";
+import crypto from "crypto";
 
 function checkAuth(req: NextRequest) {
-  const token = req.headers.get("authorization")?.replace("Bearer ", "");
-  return token === process.env.ADMIN_PASSWORD;
+  const token = req.headers.get("authorization")?.replace("Bearer ", "") ?? "";
+  const expected = process.env.ADMIN_PASSWORD ?? "";
+  if (!expected) return false; // never allow if no password configured
+  const a = Buffer.from(token);
+  const b = Buffer.from(expected);
+  // constant-time compare (avoids timing attacks); length guard first
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
 export async function GET(req: NextRequest) {
+  // Throttle auth attempts: 12 per 10 min per IP (blocks brute force)
+  if (!rateLimit(`admin:${clientIp(req)}`, 12, 600_000)) {
+    return NextResponse.json({ error: "Too many attempts" }, { status: 429 });
+  }
   if (!checkAuth(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

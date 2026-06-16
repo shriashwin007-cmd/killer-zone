@@ -41,7 +41,8 @@ export default function CartPanel() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: totalPrice,
+          // Send only item ids + quantities — the server computes the price
+          cart: cart.map((i) => ({ id: i.id, quantity: i.quantity })),
           description: "Killer Zone Add-ons Order",
         }),
       });
@@ -52,12 +53,12 @@ export default function CartPanel() {
         return;
       }
 
-      const { orderId } = await res.json();
+      const { orderId, amount } = await res.json();
       await loadScript("https://checkout.razorpay.com/v1/checkout.js");
 
       const options = {
         key: RZP_KEY,
-        amount: totalPrice * 100,
+        amount, // authoritative paise amount from server
         currency: "INR",
         name: "Killer Zone",
         description: "Add-ons & Snacks",

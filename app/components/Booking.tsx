@@ -3,7 +3,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { useCart } from "@/app/context/CartContext";
 import { useToast } from "@/app/context/ToastContext";
 
-const ROOMS = ["Any available console", "Console 1", "Console 2", "Console 3", "Console 4"];
+const ROOMS = ["Any available room", "Forza Horizon Room", "Spider-Verse Room", "Gotham × Minecraft Room"];
 const HOURS_RANGE = Array.from({ length: 13 }, (_, i) => i + 11); // 11–23
 
 const fieldStyle: React.CSSProperties = {
@@ -73,7 +73,7 @@ export default function Booking() {
     return [
       "Hi Killer Zone! I want to book a gaming session.",
       `Name: ${f.name}`, `Phone: ${f.phone}`,
-      `Console: ${f.room}`, `Players: ${f.players}`,
+      `Room: ${f.room}`, `Players: ${f.players}`,
       `Duration: ${f.hours} hour(s)`,
       f.date ? `Date: ${f.date}` : "",
       timeStr ? `Time: ${fmt24to12(selectedHour!)}` : "",
@@ -120,16 +120,21 @@ export default function Booking() {
       const res = await fetch("/api/payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: grandTotal, description: `KZ – ${f.room} – ${players}p – ${hours}hr` }),
+        body: JSON.stringify({
+          // Server recomputes the price from these — never trusts a raw total
+          cart: cart.map((i) => ({ id: i.id, quantity: i.quantity })),
+          players: f.players, hours: f.hours,
+          description: `KZ – ${f.room} – ${players}p – ${hours}hr`,
+        }),
       });
       if (!res.ok) { show("Payment unavailable — redirecting to WhatsApp"); whatsappSubmit(); return; }
 
-      const { orderId } = await res.json();
+      const { orderId, amount } = await res.json();
       await loadScript("https://checkout.razorpay.com/v1/checkout.js");
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const rzp = new (window as any).Razorpay({
-        key: RZP_KEY, amount: grandTotal * 100, currency: "INR",
+        key: RZP_KEY, amount, currency: "INR",
         name: "Killer Zone", description: `${f.room} — ${players} player(s), ${hours}hr`,
         order_id: orderId, prefill: { name: f.name, contact: f.phone },
         theme: { color: "#00f7ff" },
@@ -190,7 +195,7 @@ export default function Booking() {
 
           {[
             { label: "Pricing", text: players === 1 ? "₹200/hr for solo sessions" : "₹150/person/hr for groups of 2+" },
-            { label: "Tip", text: "Add snacks and drinks from the Add-ons section before booking." },
+            { label: "Tip", text: "Add snacks and gear from the Add-ons section before booking." },
           ].map((r) => (
             <div key={r.label} style={{ padding: "14px 0", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
               <small style={{ display: "block", fontFamily: "Rajdhani, sans-serif", fontWeight: 800, fontSize: "0.72rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "#00f7ff", marginBottom: 4 }}>{r.label}</small>

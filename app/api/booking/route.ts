@@ -1,23 +1,64 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/app/lib/supabase";
+import { cartTotal, sessionTotal } from "@/app/lib/pricing";
+import { rateLimit, clientIp } from "@/app/lib/rateLimit";
 import crypto from "crypto";
 
 function verifyRazorpay(orderId: string, paymentId: string, signature: string) {
+  const secret = process.env.RAZORPAY_KEY_SECRET ?? "";
+  if (!secret) return false;
   const expected = crypto
-    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET ?? "")
+    .createHmac("sha256", secret)
     .update(`${orderId}|${paymentId}`)
     .digest("hex");
-  return expected === signature;
+  // constant-time compare
+  const a = Buffer.from(expected);
+  const b = Buffer.from(String(signature));
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
+const str = (v: unknown, max: number) =>
+  (typeof v === "string" ? v : v == null ? "" : String(v)).trim().slice(0, max);
+
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const {
-    name, phone, room, players, hours, date, time, notes,
-    sessionAmount, addonsAmount, totalAmount,
-    cart = [],
-    razorpayPaymentId, razorpayOrderId, razorpaySignature,
-  } = body;
+  // Rate limit: 10 bookings per minute per IP
+  if (!rateLimit(`book:${clientIp(req)}`, 10, 60_000)) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  }
+
+  let body: Record<string, unknown>;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "bad_request" }, { status: 400 });
+  }
+
+  // ── Validate & sanitize inputs ──────────────────────────────────────────
+  const name  = str(body.name, 100);
+  const phone = str(body.phone, 20);
+  const room  = str(body.room, 100);
+  const date  = str(body.date, 20);
+  const time  = str(body.time, 10);
+  const notes = str(body.notes, 1000);
+  const players = Math.max(1, Math.min(50, parseInt(String(body.players)) || 1));
+  const hours   = Math.max(1, Math.min(12, parseInt(String(body.hours)) || 1));
+  const cart    = Array.isArray(body.cart) ? body.cart.slice(0, 100) : [];
+
+  if (!name || !phone) {
+    return NextResponse.json({ error: "name and phone required" }, { status: 400 });
+  }
+  if (!/^[+\d][\d\s-]{4,}$/.test(phone)) {
+    return NextResponse.json({ error: "invalid phone" }, { status: 400 });
+  }
+
+  // ── Authoritative amounts (never trust client-sent totals) ──────────────
+  const sessionAmount = sessionTotal(players, hours);
+  const addonsAmount  = cartTotal(cart);
+  const totalAmount   = sessionAmount + addonsAmount;
+
+  const { razorpayPaymentId, razorpayOrderId, razorpaySignature } = body as {
+    razorpayPaymentId?: string; razorpayOrderId?: string; razorpaySignature?: string;
+  };
 
   const paymentVerified =
     razorpayPaymentId && razorpayOrderId && razorpaySignature
@@ -26,16 +67,14 @@ export async function POST(req: NextRequest) {
 
   const status = paymentVerified ? "confirmed" : "pending";
 
-  // Save booking
   const { data: booking, error: bookingErr } = await supabase
     .from("bookings")
     .insert({
       name, phone, room,
-      players: parseInt(players) || 1,
-      hours: parseInt(hours) || 1,
+      players, hours,
       date, time_slot: time, notes,
       session_amount: sessionAmount,
-      addons_amount: addonsAmount || 0,
+      addons_amount: addonsAmount,
       total_amount: totalAmount,
       cart_items: cart,
       status,
@@ -48,7 +87,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to save booking" }, { status: 500 });
   }
 
-  // Save payment record if paid
   if (paymentVerified && booking) {
     await supabase.from("payments").insert({
       booking_id: booking.id,
@@ -58,15 +96,13 @@ export async function POST(req: NextRequest) {
       status: "success",
     });
 
-    // Block the time slot
     if (date && time) {
       const startHour = parseInt(time.split(":")[0]) || 18;
       await supabase.from("slot_blocks").insert({
         booking_id: booking.id,
-        room,
-        date,
+        room, date,
         start_hour: startHour,
-        end_hour: startHour + (parseInt(hours) || 1),
+        end_hour: startHour + hours,
       });
     }
   }

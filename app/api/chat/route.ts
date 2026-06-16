@@ -1,11 +1,25 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
+import { rateLimit, clientIp } from "@/app/lib/rateLimit";
 
 const client = new Anthropic();
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 20 messages per minute per IP (protects against abuse / cost)
+  if (!rateLimit(`chat:${clientIp(req)}`, 20, 60_000)) {
+    return NextResponse.json(
+      { reply: "You're sending messages a bit fast! Give me a sec 😅 — or WhatsApp us at +91 73585 46431." },
+      { status: 429 }
+    );
+  }
+
   try {
-    const { message, history = [] } = await req.json();
+    const raw = await req.json();
+    const message = String(raw?.message ?? "").slice(0, 1000);
+    const history = Array.isArray(raw?.history) ? raw.history.slice(-8) : [];
+    if (!message.trim()) {
+      return NextResponse.json({ reply: "Ask me anything about rooms, pricing, or add-ons! 🎮" });
+    }
 
     const response = await client.messages.create({
       model: "claude-haiku-4-5",
@@ -16,10 +30,10 @@ PRICING:
 - Solo (1 person): ₹200/hour per console
 - Group (2+ people, shared console): ₹150 per person per hour
 
-THE SPACE: One neon-lit gaming room with 4 PS5 consoles. The room has themed
-mural walls (Forza racing, Spider-Verse, Gotham × Minecraft) as the backdrop —
-these are decor, NOT separate rooms. Guests book a console, not a room.
-Never mention TV resolution or screen specs.
+ROOMS:
+- Forza Horizon Room: Racing, cinematic, high energy, great for squads
+- Spider-Verse Room: Photo-friendly, birthdays, couples, fun vibe
+- Gotham × Minecraft Room: Dark, immersive, late-night squad sessions
 
 ADD-ONS available at extra cost: Beverages, chips, snacks, extra controllers (₹150/session), VR headsets (₹300/session)
 
