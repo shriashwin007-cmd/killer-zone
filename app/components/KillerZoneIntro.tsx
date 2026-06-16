@@ -13,6 +13,7 @@ export default function KillerZoneIntro() {
     <ScrollExpandMedia
       mediaType='video'
       mediaSrc='https://res.cloudinary.com/dxvui0xkz/video/upload/q_auto/v1781549761/Killer_Zone_logo_animation_202606151758_aiux2e.mp4'
+      posterSrc='https://res.cloudinary.com/dxvui0xkz/video/upload/so_0,w_1280,c_limit,q_auto/v1781549761/Killer_Zone_logo_animation_202606151758_aiux2e.jpg'
       bgImageSrc='https://res.cloudinary.com/dxvui0xkz/image/upload/q_auto,w_1920,c_limit/v1781542712/gaming_lounge_setup_1_kigpow.png'
       title='Killer Zone'
       date='Chennai Gaming Lounge'

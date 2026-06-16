@@ -40,12 +40,30 @@ const ScrollExpandMedia = ({
   const [isMobileState, setIsMobileState] = useState<boolean>(false);
 
   const sectionRef = useRef<HTMLDivElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     setScrollProgress(0);
     setShowContent(false);
     setMediaFullyExpanded(false);
   }, [mediaType]);
+
+  // Force muted at the DOM level (React's `muted` prop is unreliable) and kick
+  // off playback — this is what stops the browser showing a play-button overlay
+  // and makes the clip actually autoplay.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = true;
+    v.defaultMuted = true;
+    const tryPlay = () => {
+      const p = v.play();
+      if (p && typeof p.catch === 'function') p.catch(() => {});
+    };
+    tryPlay();
+    v.addEventListener('canplay', tryPlay, { once: true });
+    return () => v.removeEventListener('canplay', tryPlay);
+  }, [mediaSrc, mediaType]);
 
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
@@ -178,7 +196,7 @@ const ScrollExpandMedia = ({
             className='absolute inset-0 z-0 h-full'
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 - scrollProgress }}
-            transition={{ duration: 0.1 }}
+            transition={{ duration: 0 }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -234,12 +252,13 @@ const ScrollExpandMedia = ({
                         className='absolute inset-0 bg-black/30 rounded-xl'
                         initial={{ opacity: 0.7 }}
                         animate={{ opacity: 0.5 - scrollProgress * 0.3 }}
-                        transition={{ duration: 0.2 }}
+                        transition={{ duration: 0 }}
                       />
                     </div>
                   ) : (
                     <div className='relative w-full h-full pointer-events-none'>
                       <video
+                        ref={videoRef}
                         src={mediaSrc}
                         poster={posterSrc}
                         autoPlay
@@ -261,7 +280,7 @@ const ScrollExpandMedia = ({
                         className='absolute inset-0 bg-black/30 rounded-xl'
                         initial={{ opacity: 0.7 }}
                         animate={{ opacity: 0.5 - scrollProgress * 0.3 }}
-                        transition={{ duration: 0.2 }}
+                        transition={{ duration: 0 }}
                       />
                     </div>
                   )
@@ -278,7 +297,7 @@ const ScrollExpandMedia = ({
                       className='absolute inset-0 bg-black/50 rounded-xl'
                       initial={{ opacity: 0.7 }}
                       animate={{ opacity: 0.7 - scrollProgress * 0.3 }}
-                      transition={{ duration: 0.2 }}
+                      transition={{ duration: 0 }}
                     />
                   </div>
                 )}
