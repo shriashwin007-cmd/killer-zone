@@ -3,11 +3,12 @@ import { useEffect, useRef, useState } from "react";
 
 /*
   Apple-style scroll sequence.
-  - Cloudinary extracts each frame as a JPG; we preload them all as decoded
-    <img> objects, then drawImage() the right frame → instant, no video decode.
-  - A continuous rAF loop EASES the displayed frame toward the scroll target,
-    so motion stays buttery even when mobile momentum-scroll fires events
-    sparsely (this is what fixes the "1fps / choppy" feel on phones).
+  - Cloudinary extracts each frame as a JPG; we preload them all (warm cache).
+  - A single <img> with CSS `object-fit: cover` displays the current frame —
+    the browser handles coverage natively, so it ALWAYS fills the screen on
+    every device with zero math.
+  - A continuous rAF loop EASES the shown frame toward the scroll target, so
+    motion stays silky even when mobile momentum-scroll fires events sparsely.
 */
 
 const BASE      = "https://res.cloudinary.com/dxvui0xkz/video/upload";
@@ -24,69 +25,43 @@ const isMobileDevice = () =>
 
 export default function ScrollVideoIntro() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef    = useRef<HTMLCanvasElement>(null);
+  const imgRef       = useRef<HTMLImageElement>(null);
   const overlayRef   = useRef<HTMLDivElement>(null);
   const hintRef      = useRef<HTMLDivElement>(null);
 
-  const frames        = useRef<HTMLImageElement[]>([]);
-  const drawnFrame    = useRef(-1);   // last frame actually painted
-  const displayed     = useRef(0);    // eased frame position (float)
-  const targetFrame   = useRef(0);    // scroll-driven target (float)
-  const targetProgress= useRef(0);    // 0..1 scroll progress (for overlay)
-  const frameCount    = useRef(1);
+  const srcs          = useRef<string[]>([]);
+  const ready         = useRef<boolean[]>([]);
+  const shownFrame    = useRef(-1);
+  const displayed     = useRef(0);
+  const targetFrame   = useRef(0);
+  const targetProgress= useRef(0);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const canvas    = canvasRef.current;
     const container = containerRef.current;
+    const imgEl     = imgRef.current;
     const overlay   = overlayRef.current;
     const hint      = hintRef.current;
-    if (!canvas || !container || !overlay) return;
-
-    const ctx = canvas.getContext("2d", { alpha: false });
-    if (!ctx) return;
+    if (!container || !imgEl || !overlay) return;
 
     const mobile      = isMobileDevice();
-    const FRAME_COUNT = mobile ? 56 : 84;    // more frames = finer steps
+    const FRAME_COUNT = mobile ? 56 : 84;
     const FRAME_W     = mobile ? 768 : 1280;
-    const multiplier  = mobile ? 5.0 : 5.5;  // longer scroll = slower, gentler
-    const ease        = mobile ? 0.1 : 0.14; // lower = slower, silkier glide
-    frameCount.current = FRAME_COUNT;
+    const multiplier  = mobile ? 5.0 : 5.5;   // longer scroll = slower
+    const ease        = mobile ? 0.1 : 0.14;  // lower = silkier glide
     container.style.height = `${multiplier * 100}vh`;
 
     let cancelled = false;
     let loaded    = 0;
-    let cw = 0, ch = 0; // CSS pixel size of canvas
 
-    // ── object-cover draw of a decoded image ────────────────────────────────
-    const draw = (img: HTMLImageElement) => {
-      const vw = img.naturalWidth, vh = img.naturalHeight;
-      if (!vw || !cw || !ch) return;
-      const vR = vw / vh, cR = cw / ch;
-      let sx = 0, sy = 0, sw = vw, sh = vh;
-      if (vR > cR) { sw = vh * cR; sx = (vw - sw) / 2; }
-      else         { sh = vw / cR; sy = (vh - sh) / 2; }
-      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
+    // show a frame (cached → instant, no flash)
+    const show = (idx: number) => {
+      if (idx === shownFrame.current) return;
+      if (!ready.current[idx]) return;
+      imgEl.src = srcs.current[idx];
+      shownFrame.current = idx;
     };
 
-    const redrawCurrent = () => {
-      const f = frames.current[Math.max(0, drawnFrame.current)];
-      if (f && f.complete && f.naturalWidth) draw(f);
-    };
-
-    // ── size the canvas to its real box (fixes "not covered" on mobile) ─────
-    const resize = () => {
-      cw = canvas.offsetWidth;
-      ch = canvas.offsetHeight;
-      if (!cw || !ch) return;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width  = Math.round(cw * dpr);
-      canvas.height = Math.round(ch * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      redrawCurrent();
-    };
-
-    // ── scroll → target ─────────────────────────────────────────────────────
     const onScroll = () => {
       const rect       = container.getBoundingClientRect();
       const scrollable = container.offsetHeight - window.innerHeight;
@@ -95,26 +70,16 @@ export default function ScrollVideoIntro() {
       targetFrame.current    = p * (FRAME_COUNT - 1);
     };
 
-    // ── continuous easing loop (always runs while mounted) ──────────────────
     const loop = () => {
       if (cancelled) return;
 
-      // ease displayed frame toward target
       const d = targetFrame.current - displayed.current;
       displayed.current += d * ease;
       if (Math.abs(d) < 0.001) displayed.current = targetFrame.current;
 
-      const idx = Math.round(displayed.current);
-      if (idx !== drawnFrame.current) {
-        const img = frames.current[idx];
-        if (img && img.complete && img.naturalWidth) {
-          draw(img);
-          drawnFrame.current = idx;
-        }
-      }
+      show(Math.round(displayed.current));
 
-      // overlay blend in the last stretch (driven by raw scroll progress)
-      const p = targetProgress.current;
+      const p     = targetProgress.current;
       const FADE  = 0.82;
       const raw   = p > FADE ? (p - FADE) / (1 - FADE) : 0;
       const eased = raw < 0.5 ? 2 * raw * raw : 1 - Math.pow(-2 * raw + 2, 2) / 2;
@@ -124,23 +89,24 @@ export default function ScrollVideoIntro() {
       requestAnimationFrame(loop);
     };
 
-    // ── build + preload frames ──────────────────────────────────────────────
     const buildFrames = (duration: number) => {
       const safeDur = Math.max(0.1, duration - 0.05);
-      const imgs: HTMLImageElement[] = new Array(FRAME_COUNT);
+      srcs.current  = new Array(FRAME_COUNT);
+      ready.current = new Array(FRAME_COUNT).fill(false);
       for (let i = 0; i < FRAME_COUNT; i++) {
         const t   = (i / (FRAME_COUNT - 1)) * safeDur;
-        const img = new Image();
-        img.decoding = "async";
-        img.onload = () => {
+        const url = frameUrl(t, FRAME_W);
+        srcs.current[i] = url;
+        const pre = new Image();
+        pre.decoding = "async";
+        pre.onload = () => {
+          ready.current[i] = true;
           loaded++;
           if (!cancelled) setProgress(loaded / FRAME_COUNT);
-          if (i === 0) { drawnFrame.current = -1; redrawCurrent(); drawnFrame.current = 0; }
+          if (i === 0) { imgEl.src = url; shownFrame.current = 0; }
         };
-        img.src = frameUrl(t, FRAME_W);
-        imgs[i] = img;
+        pre.src = url;
       }
-      frames.current = imgs;
     };
 
     const meta = document.createElement("video");
@@ -150,21 +116,13 @@ export default function ScrollVideoIntro() {
     meta.onerror          = () => { if (!cancelled) buildFrames(5); };
     meta.src = MP4_META;
 
-    // Robust sizing: ResizeObserver catches late layout / font / svh settle,
-    // orientationchange catches phone rotation.
-    const ro = new ResizeObserver(resize);
-    ro.observe(canvas);
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("orientationchange", resize);
-    resize();
     onScroll();
     requestAnimationFrame(loop);
 
     return () => {
       cancelled = true;
-      ro.disconnect();
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("orientationchange", resize);
     };
   }, []);
 
@@ -174,11 +132,15 @@ export default function ScrollVideoIntro() {
         position: "sticky", top: 0, height: "100svh",
         overflow: "hidden", background: "#000",
       }}>
-        <canvas
-          ref={canvasRef}
+        {/* current frame — native object-fit cover guarantees full coverage */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          ref={imgRef}
+          alt=""
           style={{
             position: "absolute", inset: 0,
-            width: "100%", height: "100%", display: "block",
+            width: "100%", height: "100%",
+            objectFit: "cover", display: "block",
           }}
         />
 
