@@ -12,7 +12,7 @@ import Footer       from "@/app/components/Footer";
 import CartPanel    from "@/app/components/CartPanel";
 import ChatWidget   from "@/app/components/ChatWidget";
 import FloatActions from "@/app/components/FloatActions";
-import KillerZoneIntro from "@/app/components/KillerZoneIntro";
+import ScrollVideoIntro from "@/app/components/ScrollVideoIntro";
 
 export default function Home() {
   const [chatOpen, setChatOpen] = useState(false);
@@ -23,7 +23,7 @@ export default function Home() {
     <>
       <Navbar onChatOpen={open} />
       <main style={{ position: "relative", zIndex: 1 }}>
-        <KillerZoneIntro />
+        <ScrollVideoIntro />
         <Hero     onChatOpen={open} />
         <Rooms />
         <AddOns />
