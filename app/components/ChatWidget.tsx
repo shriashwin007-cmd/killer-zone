@@ -4,16 +4,96 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 type Msg = { role: "assistant" | "user"; text: string };
 
 const SUGGESTIONS = [
-  "Which room is best for 4 friends?",
   "What's the pricing?",
-  "Plan a birthday session",
+  "Where are you located?",
+  "What are your timings?",
+  "How do I book?",
 ];
+
+// ── Local FAQ bot — keyword matched, no API/cost ──────────────────────────────
+type Faq = { keys: string[]; answer: string };
+
+const FAQS: Faq[] = [
+  {
+    keys: ["price", "pricing", "cost", "rate", "charge", "how much", "rs", "₹", "rupee"],
+    answer:
+      "💸 Pricing:\n• Solo (1 person): ₹200/hour\n• Group (2+ people, shared console): ₹150 per person per hour\n\nExample: 4 friends for 2 hrs = ₹1,200.",
+  },
+  {
+    keys: ["where", "location", "address", "located", "place", "reach", "direction", "anna nagar", "map"],
+    answer:
+      "📍 We're at G-55, First Main Road, Anna Nagar East, Chennai, Tamil Nadu. Tap 'Get Directions' in the Location section for the map!",
+  },
+  {
+    keys: ["time", "timing", "hour", "open", "close", "when", "today"],
+    answer: "🕒 We're open every day from 11:00 AM to 12:00 AM (midnight).",
+  },
+  {
+    keys: ["book", "booking", "reserve", "slot", "appointment"],
+    answer:
+      "🎮 Easy! Scroll to the 'Book Now' section, pick your room, players, date and time, then pay online or book via WhatsApp. Want me to point you there? Just hit 'Reserve a Slot' on the homepage.",
+  },
+  {
+    keys: ["room", "rooms", "arena", "setup", "theme"],
+    answer:
+      "🕹️ We have themed rooms:\n• Forza Horizon Room — racing, high energy\n• Spider-Verse Room — photo-friendly, great for birthdays\n• Gotham × Minecraft Room — dark, immersive late-night vibe",
+  },
+  {
+    keys: ["friend", "group", "squad", "people", "players", "4", "team"],
+    answer:
+      "👥 For groups, the Forza Horizon Room is great for squads! Group rate is ₹150 per person per hour on a shared console.",
+  },
+  {
+    keys: ["birthday", "party", "celebrat", "event", "occasion"],
+    answer:
+      "🎂 The Spider-Verse Room is perfect for birthdays! Message us on WhatsApp at +91 94444 09996 and we'll help set it up.",
+  },
+  {
+    keys: ["snack", "food", "eat", "drink", "beverage", "juice", "chips", "add-on", "addon", "cola"],
+    answer:
+      "🍿 Yes! Order beverages and snacks from the Add-ons section — chips, colas, juices, energy drinks and more, added straight to your booking.",
+  },
+  {
+    keys: ["pay", "payment", "upi", "card", "online", "razorpay"],
+    answer:
+      "💳 You can pay online securely (UPI / card) at checkout, or just order via WhatsApp and pay at the lounge.",
+  },
+  {
+    keys: ["contact", "phone", "number", "whatsapp", "call", "reach you"],
+    answer: "📞 Call or WhatsApp us at +91 94444 09996 — we usually reply fast!",
+  },
+  {
+    keys: ["vr", "headset", "controller", "gear", "ps5", "console", "game", "games"],
+    answer:
+      "🎮 We run on PS5 consoles with a big library of games. Ask the staff for the latest titles when you arrive!",
+  },
+  {
+    keys: ["hi", "hello", "hey", "yo", "sup", "namaste", "vanakkam"],
+    answer:
+      "Hey there! 👋 I can help with pricing, location, timings, rooms, and booking. What would you like to know?",
+  },
+  {
+    keys: ["thank", "thanks", "ok", "okay", "cool", "nice", "great"],
+    answer: "Anytime! 🎮 See you at Killer Zone. WhatsApp +91 94444 09996 if you need anything else.",
+  },
+];
+
+function faqReply(text: string): string {
+  const t = text.toLowerCase();
+  let best: { faq: Faq; score: number } | null = null;
+  for (const faq of FAQS) {
+    const score = faq.keys.reduce((s, k) => (t.includes(k) ? s + 1 : s), 0);
+    if (score > 0 && (!best || score > best.score)) best = { faq, score };
+  }
+  if (best) return best.faq.answer;
+  return "I'm a quick-answer assistant 🤖 — I can help with pricing, location, timings, rooms, add-ons and booking. For anything else, WhatsApp us at +91 94444 09996! 💬";
+}
 
 export default function ChatWidget({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [msgs, setMsgs] = useState<Msg[]>([
     {
       role: "assistant",
-      text: "Hey! I'm KZ Assist 🎮 — your AI gaming concierge. Ask me anything about rooms, pricing, or add-ons!",
+      text: "Hey! I'm KZ Assist 🎮 — ask me about pricing, location, timings, rooms, or how to book!",
     },
   ]);
   const [input, setInput] = useState("");
@@ -24,33 +104,18 @@ export default function ChatWidget({ isOpen, onClose }: { isOpen: boolean; onClo
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [msgs, loading]);
 
-  async function send(text: string) {
+  function send(text: string) {
     if (!text.trim() || loading) return;
     setMsgs((p) => [...p, { role: "user", text }]);
     setInput("");
     setLoading(true);
 
-    const history = msgs.map((m) => ({ role: m.role, content: m.text }));
-
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, history }),
-      });
-      const { reply } = await res.json();
+    const reply = faqReply(text);
+    // small natural "typing" delay
+    setTimeout(() => {
       setMsgs((p) => [...p, { role: "assistant", text: reply }]);
-    } catch {
-      setMsgs((p) => [
-        ...p,
-        {
-          role: "assistant",
-          text: "Connection issue — WhatsApp us at +91 94444 09996 for instant help! 💬",
-        },
-      ]);
-    } finally {
       setLoading(false);
-    }
+    }, 450);
   }
 
   return (
@@ -106,7 +171,7 @@ export default function ChatWidget({ isOpen, onClose }: { isOpen: boolean; onClo
               }}
             >
               <span className="pulse-dot" />
-              Powered by Claude AI
+              Quick answers · FAQ
             </small>
           </div>
         </div>
