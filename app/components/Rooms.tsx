@@ -4,20 +4,20 @@ import { motion, useScroll, useTransform } from "framer-motion";
 
 const ROOMS = [
   {
-    name: "Forza Horizon Room",
-    desc: "Best for racing nights, reels, and high-energy groups who want the most cinematic first impression.",
+    name: "Forza Horizon Wall",
+    desc: "The racing-themed corner — high-energy murals and the most cinematic backdrop for reels and squad photos.",
     color: "#00f7ff",
     img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781542712/forza_horizon_6_mural_wouom2.png",
   },
   {
-    name: "Spider-Verse Room",
-    desc: "Photo-friendly lighting, bold wall art, and a fun pick for birthdays, couples, and casual players.",
+    name: "Spider-Verse Wall",
+    desc: "Photo-friendly lighting and bold wall art — a fun spot for birthdays, couples, and casual players.",
     color: "#8a5cff",
     img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781542716/joker_ps5_controller_jxdrof.png",
   },
   {
-    name: "Gotham × Minecraft Room",
-    desc: "A darker squad setup with character, strong contrast, and room for longer late-night sessions.",
+    name: "Gotham × Minecraft Wall",
+    desc: "The darker side of the room — strong contrast and character for longer late-night sessions.",
     color: "#ff2d95",
     img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781542718/red_dead_redemption_mural_dj8ar8.png",
   },
@@ -78,7 +78,7 @@ function RoomCard({ r }: { r: typeof ROOMS[0] }) {
             border: `1px solid ${r.color}44`, color: r.color, background: `${r.color}0d`,
           }}
         >
-          Book This Room →
+          Book a Console →
         </a>
       </div>
     </article>
@@ -90,12 +90,12 @@ export default function Rooms() {
     <section id="rooms" style={{ padding: "80px 0", position: "relative", zIndex: 1 }}>
       <div className="wrap">
         <div style={{ marginBottom: 32 }}>
-          <div style={{ fontFamily: "Rajdhani, sans-serif", fontWeight: 800, fontSize: "0.78rem", letterSpacing: "0.26em", textTransform: "uppercase", color: "#00f7ff", marginBottom: 8 }}>The Rooms</div>
+          <div style={{ fontFamily: "Rajdhani, sans-serif", fontWeight: 800, fontSize: "0.78rem", letterSpacing: "0.26em", textTransform: "uppercase", color: "#00f7ff", marginBottom: 8 }}>The Space</div>
           <h2 style={{ fontFamily: "Orbitron, sans-serif", fontWeight: 900, fontSize: "clamp(2rem,4vw,3.2rem)", lineHeight: 1.08 }}>
-            Pick Your <span className="grad">Battle Arena</span>
+            One Room. <span className="grad">Four Consoles.</span>
           </h2>
           <p style={{ color: "rgba(248,251,255,0.65)", marginTop: 10, lineHeight: 1.65 }}>
-            Racing, superhero, dark cinematic, or playful pixel energy — pick your vibe.
+            Four PS5 consoles in one neon-lit room, wrapped in themed murals — racing, superhero, and dark cinematic vibes all around you.
           </p>
         </div>
 

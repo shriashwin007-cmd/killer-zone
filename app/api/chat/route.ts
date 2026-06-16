@@ -16,10 +16,10 @@ PRICING:
 - Solo (1 person): ₹200/hour per console
 - Group (2+ people, shared console): ₹150 per person per hour
 
-ROOMS:
-- Forza Horizon Room: Racing, cinematic, high energy, great for squads
-- Spider-Verse Room: Photo-friendly, birthdays, couples, fun vibe
-- Gotham × Minecraft Room: Dark, immersive, late-night squad sessions
+THE SPACE: One neon-lit gaming room with 4 PS5 consoles. The room has themed
+mural walls (Forza racing, Spider-Verse, Gotham × Minecraft) as the backdrop —
+these are decor, NOT separate rooms. Guests book a console, not a room.
+Never mention TV resolution or screen specs.
 
 ADD-ONS available at extra cost: Beverages, chips, snacks, extra controllers (₹150/session), VR headsets (₹300/session)
 

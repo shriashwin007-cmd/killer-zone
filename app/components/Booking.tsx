@@ -3,7 +3,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { useCart } from "@/app/context/CartContext";
 import { useToast } from "@/app/context/ToastContext";
 
-const ROOMS = ["Any available room", "Forza Horizon Room", "Spider-Verse Room", "Gotham × Minecraft Room"];
+const ROOMS = ["Any available console", "Console 1", "Console 2", "Console 3", "Console 4"];
 const HOURS_RANGE = Array.from({ length: 13 }, (_, i) => i + 11); // 11–23
 
 const fieldStyle: React.CSSProperties = {
@@ -73,7 +73,7 @@ export default function Booking() {
     return [
       "Hi Killer Zone! I want to book a gaming session.",
       `Name: ${f.name}`, `Phone: ${f.phone}`,
-      `Room: ${f.room}`, `Players: ${f.players}`,
+      `Console: ${f.room}`, `Players: ${f.players}`,
       `Duration: ${f.hours} hour(s)`,
       f.date ? `Date: ${f.date}` : "",
       timeStr ? `Time: ${fmt24to12(selectedHour!)}` : "",
@@ -190,7 +190,7 @@ export default function Booking() {
 
           {[
             { label: "Pricing", text: players === 1 ? "₹200/hr for solo sessions" : "₹150/person/hr for groups of 2+" },
-            { label: "Tip", text: "Add snacks and gear from the Add-ons section before booking." },
+            { label: "Tip", text: "Add snacks and drinks from the Add-ons section before booking." },
           ].map((r) => (
             <div key={r.label} style={{ padding: "14px 0", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
               <small style={{ display: "block", fontFamily: "Rajdhani, sans-serif", fontWeight: 800, fontSize: "0.72rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "#00f7ff", marginBottom: 4 }}>{r.label}</small>

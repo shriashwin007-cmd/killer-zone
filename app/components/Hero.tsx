@@ -3,8 +3,8 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 const STATS = [
-  { value: "PS5", label: "4K displays" },
-  { value: "4 Rooms", label: "Themed bays" },
+  { value: "PS5", label: "Latest consoles" },
+  { value: "1 Room", label: "4 consoles inside" },
   { value: "Snacks", label: "Served inside" },
   { value: "5.0 ★", label: "Rated lounge" },
 ];
@@ -36,7 +36,7 @@ export default function Hero({ onChatOpen }: { onChatOpen: () => void }) {
           </h1>
 
           <p style={{ color: "rgba(248,251,255,0.65)", fontSize: "clamp(1rem,1.6vw,1.14rem)", lineHeight: 1.72, maxWidth: 560, marginBottom: 28 }}>
-            A cinematic PS5 lounge built for squad nights, birthdays, dates, and serious gaming sessions. Choose a themed room, settle into the neon, and press start.
+            A cinematic PS5 lounge built for squad nights, birthdays, dates, and serious gaming sessions. One neon-lit room, four consoles — grab a seat and press start.
           </p>
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 32 }}>

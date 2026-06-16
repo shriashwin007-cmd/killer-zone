@@ -6,7 +6,7 @@ import { ToastProvider } from "@/app/context/ToastContext";
 export const metadata: Metadata = {
   title: "Killer Zone – Luxury Gaming Lounge in Chennai",
   description:
-    "A cinematic PS5 lounge in Chennai with themed rooms, neon ambience, snacks, and easy booking.",
+    "A cinematic PS5 lounge in Chennai — one neon-lit room with 4 consoles, snacks, and easy booking.",
 };
 
 export const viewport: Viewport = {

@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 type Msg = { role: "assistant" | "user"; text: string };
 
 const SUGGESTIONS = [
-  "Which room is best for 4 friends?",
+  "Can 4 friends get consoles together?",
   "What's the pricing?",
   "Plan a birthday session",
 ];
