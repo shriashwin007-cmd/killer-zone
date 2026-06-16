@@ -12,7 +12,8 @@ import Footer       from "@/app/components/Footer";
 import CartPanel    from "@/app/components/CartPanel";
 import ChatWidget   from "@/app/components/ChatWidget";
 import FloatActions from "@/app/components/FloatActions";
-import ScrollVideoIntro from "@/app/components/ScrollVideoIntro";
+import Intro from "@/app/components/Intro";
+import LoungeShowcase from "@/app/components/LoungeShowcase";
 
 export default function Home() {
   const [chatOpen, setChatOpen] = useState(false);
@@ -23,8 +24,9 @@ export default function Home() {
     <>
       <Navbar onChatOpen={open} />
       <main style={{ position: "relative", zIndex: 1 }}>
-        <ScrollVideoIntro />
+        <Intro />
         <Hero     onChatOpen={open} />
+        <LoungeShowcase />
         <Rooms />
         <AddOns />
         <Gallery />
