@@ -3,7 +3,7 @@ import "./globals.css";
 import { CartProvider } from "@/app/context/CartContext";
 import { ToastProvider } from "@/app/context/ToastContext";
 
-const SITE_URL = "https://killer-zone.vercel.app";
+const SITE_URL = "https://killerzone.in";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
