@@ -39,6 +39,7 @@ export const metadata: Metadata = {
     images: ["https://res.cloudinary.com/dxvui0xkz/image/upload/v1781542712/gaming_lounge_setup_1_kigpow.png"],
   },
   robots: { index: true, follow: true },
+  verification: { google: "E2jZPv22XuqDDPfmN11468btGIzjbB__8bK-fN_yPgk" },
 };
 
 // Tells Google "this is a local gaming business in Chennai" → helps it show up
