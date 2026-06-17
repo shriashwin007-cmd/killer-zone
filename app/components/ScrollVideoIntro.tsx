@@ -11,12 +11,13 @@ import { useEffect, useRef, useState } from "react";
     motion stays silky even when mobile momentum-scroll fires events sparsely.
 */
 
-const BASE      = "https://res.cloudinary.com/dxvui0xkz/video/upload";
-const PUBLIC_ID = "v1781715132/Killer_Zone_Hero_video_pc_igxi2n";
-const MP4_META  = `${BASE}/q_auto/${PUBLIC_ID}.mp4`;
+const BASE        = "https://res.cloudinary.com/dxvui0xkz/video/upload";
+const DESKTOP_ID  = "v1781715132/Killer_Zone_Hero_video_pc_igxi2n";
+const MOBILE_ID   = "v1781715132/Mobile_Version_eqozxa";
 
-const frameUrl = (t: number, w: number) =>
-  `${BASE}/so_${t.toFixed(2)},w_${w},c_limit,q_auto/${PUBLIC_ID}.jpg`;
+const metaUrl  = (id: string) => `${BASE}/q_auto/${id}.mp4`;
+const frameUrl = (id: string, t: number, w: number) =>
+  `${BASE}/so_${t.toFixed(2)},w_${w},c_limit,q_auto/${id}.jpg`;
 
 const isMobileDevice = () =>
   typeof window !== "undefined" &&
@@ -45,10 +46,11 @@ export default function ScrollVideoIntro() {
     if (!container || !imgEl || !overlay) return;
 
     const mobile      = isMobileDevice();
-    const FRAME_COUNT = mobile ? 56 : 84;
+    const publicId    = mobile ? MOBILE_ID : DESKTOP_ID;
+    const FRAME_COUNT = mobile ? 80 : 110;     // more frames = finer, smoother
     const FRAME_W     = mobile ? 768 : 1280;
-    const multiplier  = mobile ? 5.0 : 5.5;   // longer scroll = slower
-    const ease        = mobile ? 0.1 : 0.14;  // lower = silkier glide
+    const multiplier  = mobile ? 7.0 : 7.7;    // 40% longer scroll = 40% slower
+    const ease        = mobile ? 0.085 : 0.11; // lower = silkier glide
     container.style.height = `${multiplier * 100}vh`;
 
     let cancelled = false;
@@ -80,7 +82,7 @@ export default function ScrollVideoIntro() {
       show(Math.round(displayed.current));
 
       const p     = targetProgress.current;
-      const FADE  = 0.82;
+      const FADE  = 0.72;
       const raw   = p > FADE ? (p - FADE) / (1 - FADE) : 0;
       const eased = raw < 0.5 ? 2 * raw * raw : 1 - Math.pow(-2 * raw + 2, 2) / 2;
       overlay.style.opacity = String(eased);
@@ -95,7 +97,7 @@ export default function ScrollVideoIntro() {
       ready.current = new Array(FRAME_COUNT).fill(false);
       for (let i = 0; i < FRAME_COUNT; i++) {
         const t   = (i / (FRAME_COUNT - 1)) * safeDur;
-        const url = frameUrl(t, FRAME_W);
+        const url = frameUrl(publicId, t, FRAME_W);
         srcs.current[i] = url;
         const pre = new Image();
         pre.decoding = "async";
@@ -114,7 +116,7 @@ export default function ScrollVideoIntro() {
     meta.muted   = true;
     meta.onloadedmetadata = () => { if (!cancelled) buildFrames(meta.duration || 5); };
     meta.onerror          = () => { if (!cancelled) buildFrames(5); };
-    meta.src = MP4_META;
+    meta.src = metaUrl(publicId);
 
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
@@ -178,10 +180,10 @@ export default function ScrollVideoIntro() {
           </svg>
         </div>
 
-        {/* blend overlay */}
+        {/* blend overlay — fades the whole frame into the site background */}
         <div ref={overlayRef} style={{
           position: "absolute", inset: 0,
-          background: "linear-gradient(to bottom, rgba(5,7,12,0) 0%, #05070c 70%)",
+          background: "linear-gradient(to bottom, rgba(5,7,12,0.15) 0%, rgba(5,7,12,0.7) 45%, #05070c 100%)",
           opacity: 0, pointerEvents: "none",
         }}/>
       </div>

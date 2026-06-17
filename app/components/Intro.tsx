@@ -3,21 +3,15 @@ import { useEffect, useState } from "react";
 import ScrollVideoIntro from "@/app/components/ScrollVideoIntro";
 
 /*
-  The PlayStation scroll-video intro is DESKTOP ONLY.
-  On phones it's skipped entirely (no heavy video, no scroll-scrub) — mobile
-  users go straight to the hero. Renders nothing on first paint to avoid an
-  SSR/client mismatch, then mounts the video only on desktop.
+  Scroll-video intro for BOTH desktop and mobile — ScrollVideoIntro picks the
+  right per-device video internally. We just wait until after mount (client
+  only) to render it, avoiding an SSR/client mismatch and the wrong-device
+  video flashing before the media query resolves.
 */
 export default function Intro() {
-  const [mode, setMode] = useState<"loading" | "desktop" | "mobile">("loading");
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-  useEffect(() => {
-    const mobile =
-      window.matchMedia("(max-width: 768px)").matches ||
-      window.matchMedia("(pointer: coarse)").matches;
-    setMode(mobile ? "mobile" : "desktop");
-  }, []);
-
-  if (mode !== "desktop") return null; // mobile + first paint → nothing
+  if (!mounted) return null;
   return <ScrollVideoIntro />;
 }
