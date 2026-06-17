@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from "react";
 */
 
 const BASE      = "https://res.cloudinary.com/dxvui0xkz/video/upload";
-const PUBLIC_ID = "v1781549761/Killer_Zone_logo_animation_202606151758_aiux2e";
+const PUBLIC_ID = "v1781715132/Killer_Zone_Hero_video_pc_igxi2n";
 const MP4_META  = `${BASE}/q_auto/${PUBLIC_ID}.mp4`;
 
 const frameUrl = (t: number, w: number) =>
