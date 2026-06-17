@@ -43,11 +43,11 @@ export default function ScrollVideoIntro() {
 
     const mobile     = isMobileDevice();
     const PUBLIC_ID  = mobile ? MOBILE_ID : DESKTOP_ID;
-    const FRAME_COUNT = mobile ? 56 : 90;
+    const FRAME_COUNT = mobile ? 40 : 90;
     const FRAME_W     = mobile ? 768 : 1440;
-    // 35 % slower on mobile (5.0 → 6.75), 40 % slower on desktop (5.5 → 7.7)
-    const multiplier  = mobile ? 6.75 : 7.7;
-    const ease        = mobile ? 0.09 : 0.12;
+    // mobile: reduced to 4.75 (removed 2 dead scroll heights), higher ease for smoothness
+    const multiplier  = mobile ? 4.75 : 7.7;
+    const ease        = mobile ? 0.18 : 0.12;
     container.style.height = `${multiplier * 100}vh`;
 
     let cancelled = false;
