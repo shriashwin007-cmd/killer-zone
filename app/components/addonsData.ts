@@ -14,6 +14,9 @@ export const BEVERAGES: Item[] = [
   { id: "bev14", name: "Coca-Cola",             price: 50,  icon: "🥤", label: "₹50",  desc: "The original Coca-Cola.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781540831/coca_cola_gd5nsn.jpg" },
   { id: "bev15", name: "Limca",                 price: 50,  icon: "🍋", label: "₹50",  desc: "Limca — lemony refreshing fizz.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781540832/limca_jps5rr.jpg" },
   { id: "bev16", name: "7UP",                   price: 50,  icon: "🍋", label: "₹50",  desc: "7UP — clear lemon-lime soda.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781540831/7up_swqxbt.jpg" },
+  { id: "bev17", name: "Tropicana Orange",      price: 10,  icon: "🍊", label: "₹10",  desc: "Tropicana Orange juice.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781715303/Tropicana_Orange_x9i6ie.png" },
+  { id: "bev18", name: "Tropicana Guava",       price: 10,  icon: "🍹", label: "₹10",  desc: "Tropicana Guava juice.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781715302/Tropicana_Guava_u76vr5.png" },
+  { id: "bev19", name: "Tropicana Apple",       price: 10,  icon: "🍎", label: "₹10",  desc: "Tropicana Apple juice.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781715301/Tropicana_Apple_wswouw.png" },
 ];
 
 export const SNACKS: Item[] = [

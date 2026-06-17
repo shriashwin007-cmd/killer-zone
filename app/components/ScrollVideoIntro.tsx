@@ -2,22 +2,18 @@
 import { useEffect, useRef, useState } from "react";
 
 /*
-  Apple-style scroll sequence.
-  - Cloudinary extracts each frame as a JPG; we preload them all (warm cache).
-  - A single <img> with CSS `object-fit: cover` displays the current frame —
-    the browser handles coverage natively, so it ALWAYS fills the screen on
-    every device with zero math.
-  - A continuous rAF loop EASES the shown frame toward the scroll target, so
-    motion stays silky even when mobile momentum-scroll fires events sparsely.
+  Apple-style scroll sequence — separate videos for mobile and desktop.
+  Mobile : Mobile_Version_eqozxa  (35 % slower → multiplier 6.75)
+  Desktop: Killer_Zone_Hero_video_pc_igxi2n (40 % slower → multiplier 7.7)
 */
 
-const BASE        = "https://res.cloudinary.com/dxvui0xkz/video/upload";
-const DESKTOP_ID  = "v1781715132/Killer_Zone_Hero_video_pc_igxi2n";
-const MOBILE_ID   = "v1781715132/Mobile_Version_eqozxa";
+const BASE = "https://res.cloudinary.com/dxvui0xkz/video/upload";
 
-const metaUrl  = (id: string) => `${BASE}/q_auto/${id}.mp4`;
-const frameUrl = (id: string, t: number, w: number) =>
-  `${BASE}/so_${t.toFixed(2)},w_${w},c_limit,q_auto/${id}.jpg`;
+const MOBILE_ID  = "v1781715132/Mobile_Version_eqozxa";
+const DESKTOP_ID = "v1781715132/Killer_Zone_Hero_video_pc_igxi2n";
+
+const frameUrl = (publicId: string, t: number, w: number) =>
+  `${BASE}/so_${t.toFixed(2)},w_${w},c_limit,q_auto/${publicId}.jpg`;
 
 const isMobileDevice = () =>
   typeof window !== "undefined" &&
@@ -45,18 +41,18 @@ export default function ScrollVideoIntro() {
     const hint      = hintRef.current;
     if (!container || !imgEl || !overlay) return;
 
-    const mobile      = isMobileDevice();
-    const publicId    = mobile ? MOBILE_ID : DESKTOP_ID;
-    const FRAME_COUNT = mobile ? 80 : 110;     // more frames = finer, smoother
-    const FRAME_W     = mobile ? 768 : 1280;
-    const multiplier  = mobile ? 9.5 : 7.7;    // mobile 35% slower again; desktop unchanged
-    const ease        = mobile ? 0.085 : 0.11; // lower = silkier glide
+    const mobile     = isMobileDevice();
+    const PUBLIC_ID  = mobile ? MOBILE_ID : DESKTOP_ID;
+    const FRAME_COUNT = mobile ? 56 : 90;
+    const FRAME_W     = mobile ? 768 : 1440;
+    // 35 % slower on mobile (5.0 → 6.75), 40 % slower on desktop (5.5 → 7.7)
+    const multiplier  = mobile ? 6.75 : 7.7;
+    const ease        = mobile ? 0.09 : 0.12;
     container.style.height = `${multiplier * 100}vh`;
 
     let cancelled = false;
     let loaded    = 0;
 
-    // show a frame (cached → instant, no flash)
     const show = (idx: number) => {
       if (idx === shownFrame.current) return;
       if (!ready.current[idx]) return;
@@ -82,7 +78,7 @@ export default function ScrollVideoIntro() {
       show(Math.round(displayed.current));
 
       const p     = targetProgress.current;
-      const FADE  = 0.72;
+      const FADE  = 0.82;
       const raw   = p > FADE ? (p - FADE) / (1 - FADE) : 0;
       const eased = raw < 0.5 ? 2 * raw * raw : 1 - Math.pow(-2 * raw + 2, 2) / 2;
       overlay.style.opacity = String(eased);
@@ -97,7 +93,7 @@ export default function ScrollVideoIntro() {
       ready.current = new Array(FRAME_COUNT).fill(false);
       for (let i = 0; i < FRAME_COUNT; i++) {
         const t   = (i / (FRAME_COUNT - 1)) * safeDur;
-        const url = frameUrl(publicId, t, FRAME_W);
+        const url = frameUrl(PUBLIC_ID, t, FRAME_W);
         srcs.current[i] = url;
         const pre = new Image();
         pre.decoding = "async";
@@ -116,7 +112,7 @@ export default function ScrollVideoIntro() {
     meta.muted   = true;
     meta.onloadedmetadata = () => { if (!cancelled) buildFrames(meta.duration || 5); };
     meta.onerror          = () => { if (!cancelled) buildFrames(5); };
-    meta.src = metaUrl(publicId);
+    meta.src = `${BASE}/q_auto/${PUBLIC_ID}.mp4`;
 
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
@@ -134,7 +130,6 @@ export default function ScrollVideoIntro() {
         position: "sticky", top: 0, height: "100svh",
         overflow: "hidden", background: "#000",
       }}>
-        {/* current frame — native object-fit cover guarantees full coverage */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           ref={imgRef}
@@ -146,7 +141,6 @@ export default function ScrollVideoIntro() {
           }}
         />
 
-        {/* preload progress */}
         {progress < 1 && (
           <div style={{
             position: "absolute", left: "50%", top: "50%",
@@ -161,7 +155,6 @@ export default function ScrollVideoIntro() {
           </div>
         )}
 
-        {/* scroll hint */}
         <div ref={hintRef} style={{
           position: "absolute", bottom: 44, left: "50%",
           transform: "translateX(-50%)",
@@ -180,10 +173,9 @@ export default function ScrollVideoIntro() {
           </svg>
         </div>
 
-        {/* blend overlay — fades the whole frame into the site background */}
         <div ref={overlayRef} style={{
           position: "absolute", inset: 0,
-          background: "linear-gradient(to bottom, rgba(5,7,12,0.15) 0%, rgba(5,7,12,0.7) 45%, #05070c 100%)",
+          background: "linear-gradient(to bottom, rgba(5,7,12,0) 0%, #05070c 70%)",
           opacity: 0, pointerEvents: "none",
         }}/>
       </div>

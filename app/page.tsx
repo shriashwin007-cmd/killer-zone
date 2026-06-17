@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Navbar       from "@/app/components/Navbar";
+import Intro        from "@/app/components/Intro";
 import Hero         from "@/app/components/Hero";
 import Rooms        from "@/app/components/Rooms";
 import AddOns       from "@/app/components/AddOns";
@@ -12,7 +13,6 @@ import Footer       from "@/app/components/Footer";
 import CartPanel    from "@/app/components/CartPanel";
 import ChatWidget   from "@/app/components/ChatWidget";
 import FloatActions from "@/app/components/FloatActions";
-import Intro        from "@/app/components/Intro";
 
 export default function Home() {
   const [chatOpen, setChatOpen] = useState(false);
@@ -22,8 +22,8 @@ export default function Home() {
   return (
     <>
       <Navbar onChatOpen={open} />
+      <Intro />
       <main style={{ position: "relative", zIndex: 1 }}>
-        <Intro />
         <Hero     onChatOpen={open} />
         <Rooms />
         <AddOns />
