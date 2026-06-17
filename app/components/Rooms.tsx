@@ -1,111 +1,85 @@
 "use client";
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
 
-const ROOMS = [
-  {
-    name: "Forza Horizon Wall",
-    desc: "The racing-themed corner — high-energy murals and the most cinematic backdrop for reels and squad photos.",
-    color: "#00f7ff",
-    img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781542712/forza_horizon_6_mural_wouom2.png",
-  },
-  {
-    name: "Spider-Verse Wall",
-    desc: "Photo-friendly lighting and bold wall art — a fun spot for birthdays, couples, and casual players.",
-    color: "#8a5cff",
-    img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781542716/joker_ps5_controller_jxdrof.png",
-  },
-  {
-    name: "Gotham × Minecraft Wall",
-    desc: "The darker side of the room — strong contrast and character for longer late-night sessions.",
-    color: "#ff2d95",
-    img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781542718/red_dead_redemption_mural_dj8ar8.png",
-  },
+const CONSOLES = [
+  { num: "01", label: "Console 1", color: "#00f7ff" },
+  { num: "02", label: "Console 2", color: "#8a5cff" },
+  { num: "03", label: "Console 3", color: "#ff2d95" },
+  { num: "04", label: "Console 4", color: "#00f7ff" },
 ];
-
-function RoomCard({ r }: { r: typeof ROOMS[0] }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const y = useTransform(scrollYProgress, [0, 1], ["-30px", "30px"]);
-
-  return (
-    <article
-      className="glass"
-      style={{ borderRadius: 18, overflow: "hidden", transition: "transform .25s, box-shadow .25s" }}
-      onMouseEnter={e => {
-        const el = e.currentTarget as HTMLElement;
-        el.style.transform = "translateY(-6px)";
-        el.style.boxShadow = `0 20px 60px ${r.color}33`;
-      }}
-      onMouseLeave={e => {
-        const el = e.currentTarget as HTMLElement;
-        el.style.transform = "";
-        el.style.boxShadow = "";
-      }}
-    >
-      {/* Parallax image */}
-      <div ref={ref} style={{ height: 220, overflow: "hidden", position: "relative" }}>
-        <motion.img
-          src={r.img}
-          alt={r.name}
-          style={{
-            y,
-            position: "absolute",
-            top: -40,
-            left: 0,
-            width: "100%",
-            height: "calc(100% + 80px)",
-            objectFit: "cover",
-            willChange: "transform",
-          }}
-        />
-        <div style={{ position: "absolute", inset: 0, background: `linear-gradient(180deg, transparent 45%, rgba(2,7,20,0.65) 100%)` }} />
-        <div style={{ position: "absolute", inset: 0, background: `linear-gradient(135deg, ${r.color}0a 0%, transparent 60%)` }} />
-      </div>
-
-      <div style={{ padding: "20px 20px 24px" }}>
-        <h3 style={{ fontFamily: "Orbitron, sans-serif", fontSize: "0.95rem", marginBottom: 10, color: r.color }}>{r.name}</h3>
-        <p style={{ color: "rgba(248,251,255,0.65)", lineHeight: 1.65, fontSize: "0.88rem", marginBottom: 16 }}>{r.desc}</p>
-        <a
-          href="#book"
-          style={{
-            display: "inline-flex", alignItems: "center", gap: 6,
-            padding: "8px 16px", borderRadius: 10, textDecoration: "none",
-            fontSize: "0.78rem", fontWeight: 700, fontFamily: "Orbitron, sans-serif",
-            border: `1px solid ${r.color}44`, color: r.color, background: `${r.color}0d`,
-          }}
-        >
-          Book a Console →
-        </a>
-      </div>
-    </article>
-  );
-}
 
 export default function Rooms() {
   return (
     <section id="rooms" style={{ padding: "80px 0", position: "relative", zIndex: 1 }}>
       <div className="wrap">
-        <div style={{ marginBottom: 32 }}>
-          <div style={{ fontFamily: "Rajdhani, sans-serif", fontWeight: 800, fontSize: "0.78rem", letterSpacing: "0.26em", textTransform: "uppercase", color: "#00f7ff", marginBottom: 8 }}>The Space</div>
+
+        <div style={{ marginBottom: 48 }}>
+          <div style={{ fontFamily: "Rajdhani, sans-serif", fontWeight: 800, fontSize: "0.78rem", letterSpacing: "0.26em", textTransform: "uppercase", color: "#00f7ff", marginBottom: 8 }}>The Zone</div>
           <h2 style={{ fontFamily: "Orbitron, sans-serif", fontWeight: 900, fontSize: "clamp(2rem,4vw,3.2rem)", lineHeight: 1.08 }}>
-            One Room. <span className="grad">Four Consoles.</span>
+            1 Room. <span className="grad">4 Consoles.</span>
           </h2>
-          <p style={{ color: "rgba(248,251,255,0.65)", marginTop: 10, lineHeight: 1.65 }}>
-            Four PS5 consoles in one neon-lit room, wrapped in themed murals — racing, superhero, and dark cinematic vibes all around you.
+          <p style={{ color: "rgba(248,251,255,0.65)", marginTop: 10, lineHeight: 1.65, maxWidth: 520 }}>
+            One premium gaming lounge with 4 PS5 consoles — play solo or bring your squad. Every console gets its own screen, controller, and full PS5 library access.
           </p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
-          {ROOMS.map((r) => <RoomCard key={r.name} r={r} />)}
+        {/* Console grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }} className="console-grid">
+          {CONSOLES.map((c) => (
+            <div key={c.num} className="glass" style={{
+              borderRadius: 16, padding: "28px 20px",
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
+              border: `1px solid ${c.color}22`,
+              background: `linear-gradient(135deg, ${c.color}08 0%, rgba(5,7,12,0.6) 100%)`,
+            }}>
+              <div style={{
+                width: 56, height: 56, borderRadius: "50%",
+                background: `${c.color}18`,
+                border: `2px solid ${c.color}44`,
+                display: "grid", placeItems: "center",
+                fontFamily: "Orbitron, sans-serif", fontWeight: 900,
+                fontSize: "1rem", color: c.color,
+              }}>{c.num}</div>
+              <div style={{ fontFamily: "Orbitron, sans-serif", fontWeight: 700, fontSize: "0.78rem", color: "#f8fbff", letterSpacing: "0.1em" }}>{c.label}</div>
+              <div style={{ fontSize: "0.75rem", color: "rgba(248,251,255,0.45)", textAlign: "center", lineHeight: 1.5 }}>PS5 · 4K Display · Full Library</div>
+            </div>
+          ))}
         </div>
+
+        {/* Features row */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginTop: 14 }} className="features-grid">
+          {[
+            { icon: "🎮", title: "Solo Session", desc: "₹200/hr — your own console, your own pace." },
+            { icon: "👥", title: "Group Session", desc: "₹150/person/hr — up to 4 players at once." },
+            { icon: "🎂", title: "Birthday & Events", desc: "Book the whole zone for private parties." },
+          ].map((f) => (
+            <div key={f.title} className="glass" style={{ borderRadius: 16, padding: "24px 20px" }}>
+              <div style={{ fontSize: "1.8rem", marginBottom: 10 }}>{f.icon}</div>
+              <h3 style={{ fontFamily: "Orbitron, sans-serif", fontSize: "0.88rem", color: "#f8fbff", marginBottom: 8 }}>{f.title}</h3>
+              <p style={{ color: "rgba(248,251,255,0.55)", fontSize: "0.82rem", lineHeight: 1.6 }}>{f.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ marginTop: 32, textAlign: "center" }}>
+          <a href="#book" style={{
+            display: "inline-flex", alignItems: "center", justifyContent: "center",
+            padding: "14px 36px", borderRadius: 14, textDecoration: "none",
+            fontFamily: "Orbitron, sans-serif", fontWeight: 800, fontSize: "0.9rem",
+            color: "#021014", background: "linear-gradient(135deg,#00f7ff,#8a5cff)",
+            boxShadow: "0 12px 32px rgba(0,247,255,0.22)",
+          }}>Book Your Console →</a>
+        </div>
+
       </div>
 
       <style>{`
-        @media (max-width: 860px) { #rooms .wrap > div:last-child { grid-template-columns: 1fr !important; } }
+        @media (max-width: 860px) {
+          .console-grid  { grid-template-columns: repeat(2,1fr) !important; }
+          .features-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 480px) {
+          .console-grid { grid-template-columns: repeat(2,1fr) !important; }
+        }
       `}</style>
     </section>
   );
