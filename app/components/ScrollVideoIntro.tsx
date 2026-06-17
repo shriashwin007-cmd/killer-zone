@@ -49,7 +49,7 @@ export default function ScrollVideoIntro() {
     const publicId    = mobile ? MOBILE_ID : DESKTOP_ID;
     const FRAME_COUNT = mobile ? 80 : 110;     // more frames = finer, smoother
     const FRAME_W     = mobile ? 768 : 1280;
-    const multiplier  = mobile ? 7.0 : 7.7;    // 40% longer scroll = 40% slower
+    const multiplier  = mobile ? 9.5 : 7.7;    // mobile 35% slower again; desktop unchanged
     const ease        = mobile ? 0.085 : 0.11; // lower = silkier glide
     container.style.height = `${multiplier * 100}vh`;
 
