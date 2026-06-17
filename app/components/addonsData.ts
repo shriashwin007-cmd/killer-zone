@@ -27,9 +27,11 @@ export const SNACKS: Item[] = [
   { id: "sn5",  name: "Kurkure Masala Munch",    price: 30, icon: "🌶️", label: "₹30", desc: "Kurkure Masala Munch — bold Indian spices.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781541659/kurkure_masala_munch_bjtdae.jpg" },
   { id: "sn6",  name: "Doritos Sweet Chilli",    price: 50, icon: "🌶️", label: "₹50", desc: "Doritos Sweet Chilli — bold triangle chips.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781541652/doritos_sweet_chilli_wrlnmq.jpg" },
   { id: "sn7",  name: "Doritos Nacho Cheese",    price: 50, icon: "🧀", label: "₹50", desc: "Doritos Nacho Cheese — cheesy crunch.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781541651/doritos_nacho_cheese_on1jh6.jpg" },
-  { id: "sn8",  name: "Bingo Chilli Style",      price: 30, icon: "🔥", label: "₹30", desc: "Bingo Original Style Chilli crisps.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781541650/bingo_original_style_chilli_knjeff.jpg" },
+  { id: "sn8",  name: "Lays Chilli",              price: 30, icon: "🌶️", label: "₹30", desc: "Lays Chilli — fiery crunch.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781715362/Lays_Chilli_aocqrq.png" },
   { id: "sn9",  name: "Doritos Cool Ranch",      price: 50, icon: "🤠", label: "₹50", desc: "Doritos Cool Ranch — cool & creamy.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781541650/doritos_cool_ranch_ojwo5v.jpg" },
-  { id: "sn10", name: "Bingo Cream & Onion",     price: 30, icon: "🧅", label: "₹30", desc: "Bingo Cream & Onion — smooth and crispy.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781541649/bingo_cream_and_onion_ox0rrx.jpg" },
+  { id: "sn10", name: "Lays Blue",               price: 30, icon: "🥔", label: "₹30", desc: "Lays Blue — classic salted chips.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781715360/Lays_Blue_rfsslg.png" },
+  { id: "sn11", name: "Kurkure Naughty Tomato",  price: 30, icon: "🍅", label: "₹30", desc: "Kurkure Naughty Tomato — tangy twist.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781715359/Kurkure_Naughty_Tomato_xhslqv.png" },
+  { id: "sn12", name: "Kurkure Green Chilli",    price: 30, icon: "🫑", label: "₹30", desc: "Kurkure Green Chilli — bold spicy crunch.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781715359/Kurkure_Green_Chilli_brhr3o.png" },
 ];
 
 export const CATEGORIES = {
