@@ -31,22 +31,22 @@ const FAQS: Faq[] = [
   {
     keys: ["book", "booking", "reserve", "slot", "appointment"],
     answer:
-      "🎮 Easy! Scroll to the 'Book Now' section, pick your room, players, date and time, then pay online or book via WhatsApp. Want me to point you there? Just hit 'Reserve a Slot' on the homepage.",
+      "🎮 Easy! Scroll to the 'Book Now' section, pick your console, players, date and time, then pay online or book via WhatsApp. Want me to point you there? Just hit 'Reserve a Slot' on the homepage.",
   },
   {
-    keys: ["room", "rooms", "arena", "setup", "theme"],
+    keys: ["room", "rooms", "arena", "setup", "theme", "console"],
     answer:
-      "🕹️ We have themed rooms:\n• Forza Horizon Room — racing, high energy\n• Spider-Verse Room — photo-friendly, great for birthdays\n• Gotham × Minecraft Room — dark, immersive late-night vibe",
+      "🕹️ We have 1 premium gaming room with 4 PS5 consoles — Console 01 to 04. Each console has its own 4K display and full PS5 game library. Play solo or bring your squad!",
   },
   {
     keys: ["friend", "group", "squad", "people", "players", "4", "team"],
     answer:
-      "👥 For groups, the Forza Horizon Room is great for squads! Group rate is ₹150 per person per hour on a shared console.",
+      "👥 Bring your squad! We have 4 PS5 consoles so up to 4 people can play at the same time. Group rate is ₹150 per person per hour.",
   },
   {
     keys: ["birthday", "party", "celebrat", "event", "occasion"],
     answer:
-      "🎂 The Spider-Verse Room is perfect for birthdays! Message us on WhatsApp at +91 94444 09996 and we'll help set it up.",
+      "🎂 We do birthday setups and private events! Book the whole zone for your party. Message us on WhatsApp at +91 94444 09996 and we'll sort it out.",
   },
   {
     keys: ["snack", "food", "eat", "drink", "beverage", "juice", "chips", "add-on", "addon", "cola"],

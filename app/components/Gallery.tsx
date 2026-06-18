@@ -15,7 +15,7 @@ const IMAGES = [
   },
   {
     src: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781542712/forza_horizon_6_mural_wouom2.png",
-    label: "Forza Mural",
+    label: "Gaming Mural",
     span: false,
   },
   {
