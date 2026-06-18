@@ -4,7 +4,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 
 const STATS = [
   { value: "PS5", label: "Pro consoles" },
-  { value: "4 Rooms", label: "Themed bays" },
+  { value: "4", label: "PS5 Consoles" },
   { value: "Snacks", label: "Served inside" },
   { value: "5.0 ★", label: "Rated lounge" },
 ];
