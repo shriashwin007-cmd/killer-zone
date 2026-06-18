@@ -12,6 +12,7 @@ export const BEVERAGES: Item[] = [
   { id: "bev13", name: "Minute Maid Orange",    price: 55,  icon: "🍊", label: "₹55",  desc: "Minute Maid Pulpy Orange juice.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781540832/minute_maid_pulpy_orange_yjgtxq.jpg" },
   { id: "bev14", name: "Coca-Cola",             price: 50,  icon: "🥤", label: "₹50",  desc: "The original Coca-Cola.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781540831/coca_cola_gd5nsn.jpg" },
   { id: "bev15", name: "Limca",                 price: 50,  icon: "🍋", label: "₹50",  desc: "Limca — lemony refreshing fizz.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781540832/limca_jps5rr.jpg" },
+  { id: "bev20", name: "Red Bull",              price: 150, icon: "🐂", label: "₹150", desc: "Red Bull Energy Drink — wings for your game.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781809303/redbull_vj6ucz.png" },
 ];
 
 export const SNACKS: Item[] = [
@@ -27,6 +28,11 @@ export const SNACKS: Item[] = [
   { id: "sn10", name: "Lays Blue",               price: 30, icon: "🥔", label: "₹30", desc: "Lays Blue — classic salted chips.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781715360/Lays_Blue_rfsslg.png" },
   { id: "sn11", name: "Kurkure Naughty Tomato",  price: 30, icon: "🍅", label: "₹30", desc: "Kurkure Naughty Tomato — tangy twist.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781715359/Kurkure_Naughty_Tomato_xhslqv.png" },
   { id: "sn12", name: "Kurkure Green Chilli",    price: 30, icon: "🫑", label: "₹30", desc: "Kurkure Green Chilli — bold spicy crunch.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781715359/Kurkure_Green_Chilli_brhr3o.png" },
+  { id: "sn13", name: "Cheetos Flamin Hot",      price: 30, icon: "🔥", label: "₹30", desc: "Cheetos Flamin Hot — intense fiery crunch.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781809221/cheetos_flamin_hot_risrtv.png" },
+  { id: "sn14", name: "Cheetos Puff",            price: 30, icon: "🧡", label: "₹30", desc: "Cheetos Puff — light, airy cheesy puffs.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781809221/cheetos_puff_se2wru.png" },
+  { id: "sn15", name: "Cheetos Masala Balls",    price: 30, icon: "🌶️", label: "₹30", desc: "Cheetos Masala Balls — spicy round bites.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781809221/cheetos_masala_balls_m8aesm.png" },
+  { id: "sn16", name: "Kurkure Green Chutney",   price: 30, icon: "🌿", label: "₹30", desc: "Kurkure Green Chutney — tangy herby crunch.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781809221/kurkure_green_chutne_yvi36o.png" },
+  { id: "sn17", name: "Cheetos Cheez Puf",       price: 30, icon: "🧀", label: "₹30", desc: "Cheetos Cheez Puf — classic cheesy snack.", img: "https://res.cloudinary.com/dxvui0xkz/image/upload/v1781809220/cheetos_cheez_puf_xmkclu.png" },
 ];
 
 export const CATEGORIES = {
