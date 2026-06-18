@@ -52,17 +52,29 @@ function HoverParticles({ active }: { active: boolean }) {
 }
 
 export default function AddOnCard({ item, large = false }: { item: Item; large?: boolean }) {
-  const [qty, setQty] = useState(0);
   const [hovered, setHovered] = useState(false);
   const [shaking, setShaking] = useState(false);
-  const { addToCart } = useCart();
+  const { cart, addToCart, removeItem } = useCart();
   const { show } = useToast();
   const { particles, burst } = useBurst();
+
+  const cartItem = cart.find((c) => c.id === item.id);
+  const inCart = !!cartItem;
 
   function handleImgClick(e: React.MouseEvent) {
     burst(e, item.icon);
     setShaking(true);
     setTimeout(() => setShaking(false), 500);
+  }
+
+  function handleAdd() {
+    addToCart({ id: item.id, name: item.name, price: item.price, icon: item.icon }, 1);
+    show(`${item.name} added! 🛒`);
+  }
+
+  function handleRemove() {
+    removeItem(item.id);
+    show(`${item.name} removed`);
   }
 
   return (
@@ -74,12 +86,26 @@ export default function AddOnCard({ item, large = false }: { item: Item; large?:
         borderRadius: 18, overflow: "hidden", display: "flex", flexDirection: "column",
         transition: "transform .28s, border-color .28s, box-shadow .28s",
         transform: hovered ? "translateY(-7px)" : "",
-        borderColor: hovered ? "rgba(0,247,255,0.4)" : "",
-        boxShadow: hovered ? "0 24px 60px rgba(0,247,255,0.14)" : "",
+        borderColor: inCart ? "rgba(0,247,255,0.5)" : hovered ? "rgba(0,247,255,0.4)" : "",
+        boxShadow: inCart
+          ? "0 0 0 1.5px rgba(0,247,255,0.35), 0 24px 60px rgba(0,247,255,0.14)"
+          : hovered ? "0 24px 60px rgba(0,247,255,0.14)" : "",
         position: "relative",
       }}
     >
       <HoverParticles active={hovered} />
+
+      {/* In-cart badge */}
+      {inCart && (
+        <div style={{
+          position: "absolute", top: 10, right: 10, zIndex: 5,
+          background: "#00f7ff", color: "#021014",
+          fontFamily: "Orbitron, sans-serif", fontWeight: 900, fontSize: "0.68rem",
+          borderRadius: 999, padding: "3px 9px", letterSpacing: "0.04em",
+        }}>
+          ×{cartItem!.quantity} in cart
+        </div>
+      )}
 
       {/* Image area */}
       <div
@@ -127,23 +153,41 @@ export default function AddOnCard({ item, large = false }: { item: Item; large?:
         <p style={{ color: "rgba(248,251,255,0.6)", fontSize: large ? "0.9rem" : "0.8rem", lineHeight: 1.55, flex: 1 }}>{item.desc}</p>
 
         <div className="addon-controls" style={{ display: "flex", gap: 8, alignItems: "center", marginTop: "auto" }}>
-          <div className="addon-stepper" style={{ display: "flex", alignItems: "center", gap: 6, border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "5px 8px", background: "rgba(255,255,255,0.04)" }}>
-            <button className="addon-step" disabled={qty === 0} onClick={() => setQty((q) => Math.max(0, q - 1))}
-              style={{ width: 30, height: 30, borderRadius: 7, border: "1px solid rgba(255,255,255,0.16)", background: "rgba(255,255,255,0.06)", color: "#f8fbff", fontWeight: 800, cursor: qty === 0 ? "not-allowed" : "pointer", opacity: qty === 0 ? 0.35 : 1, fontFamily: "inherit", fontSize: "0.95rem" }}>−</button>
-            <span style={{ minWidth: 22, textAlign: "center", fontWeight: 700, color: "#00f7ff", fontSize: "0.95rem" }}>{qty}</span>
-            <button className="addon-step" onClick={() => setQty((q) => q + 1)}
-              style={{ width: 30, height: 30, borderRadius: 7, border: "1px solid rgba(255,255,255,0.16)", background: "rgba(255,255,255,0.06)", color: "#f8fbff", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", fontSize: "0.95rem" }}>+</button>
-          </div>
-          <button className="addon-add" onClick={() => {
-            if (qty === 0) { show("Select a quantity first"); return; }
-            addToCart({ id: item.id, name: item.name, price: item.price, icon: item.icon }, qty);
-            show(`${item.name} added! 🛒`);
-            setQty(0);
-          }} style={{
-            flex: 1, minHeight: 44, borderRadius: 10, border: "none",
-            color: "#021014", background: hovered ? "linear-gradient(135deg,#00f7ff,#ff2d95)" : "linear-gradient(135deg,#00f7ff,#8a5cff)",
-            fontWeight: 800, cursor: "pointer", fontSize: "0.85rem", fontFamily: "inherit", transition: "background .3s",
-          }}>Add to Cart</button>
+          {inCart ? (
+            /* Trash button — removes item from cart */
+            <button
+              onClick={handleRemove}
+              title="Remove from cart"
+              style={{
+                flex: 1, minHeight: 44, borderRadius: 10, border: "1px solid rgba(255,45,149,0.35)",
+                background: "rgba(255,45,149,0.1)", color: "#ff2d95",
+                fontWeight: 800, cursor: "pointer", fontSize: "1.1rem", fontFamily: "inherit",
+                transition: "background .2s, border-color .2s",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6M14 11v6"/>
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+              Remove
+            </button>
+          ) : (
+            /* Add button — adds 1 instantly */
+            <button
+              onClick={handleAdd}
+              style={{
+                flex: 1, minHeight: 44, borderRadius: 10, border: "none",
+                color: "#021014", background: hovered ? "linear-gradient(135deg,#00f7ff,#ff2d95)" : "linear-gradient(135deg,#00f7ff,#8a5cff)",
+                fontWeight: 800, cursor: "pointer", fontSize: "0.88rem", fontFamily: "inherit",
+                transition: "background .3s",
+              }}
+            >
+              + Add
+            </button>
+          )}
         </div>
       </div>
     </article>
