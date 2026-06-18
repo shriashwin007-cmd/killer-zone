@@ -3,7 +3,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { useCart } from "@/app/context/CartContext";
 import { useToast } from "@/app/context/ToastContext";
 
-const ROOMS = ["Any available room", "Forza Horizon Room", "Spider-Verse Room", "Gotham × Minecraft Room"];
+const ROOMS = ["Any available console", "Console 01", "Console 02", "Console 03", "Console 04"];
 const HOURS_RANGE = Array.from({ length: 13 }, (_, i) => i + 11); // 11–23
 
 const fieldStyle: React.CSSProperties = {
@@ -73,7 +73,7 @@ export default function Booking() {
     return [
       "Hi Killer Zone! I want to book a gaming session.",
       `Name: ${f.name}`, `Phone: ${f.phone}`,
-      `Room: ${f.room}`, `Players: ${f.players}`,
+      `Console: ${f.room}`, `Players: ${f.players}`,
       `Duration: ${f.hours} hour(s)`,
       f.date ? `Date: ${f.date}` : "",
       timeStr ? `Time: ${fmt24to12(selectedHour!)}` : "",
