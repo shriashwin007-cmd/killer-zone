@@ -86,6 +86,16 @@ export default function AdminPage() {
     setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status } : b)));
   }
 
+  async function deleteBooking(id: string, name: string) {
+    if (!confirm(`Delete booking for "${name}"? This cannot be undone.`)) return;
+    await fetch("/api/admin/bookings", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ id }),
+    });
+    setBookings((prev) => prev.filter((b) => b.id !== id));
+  }
+
   const today = todayISO();
 
   const filtered = useMemo(() => {
@@ -320,6 +330,10 @@ export default function AdminPage() {
                           style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid #25d36644", background: "rgba(37,211,102,0.1)", color: "#25d366", textDecoration: "none", fontSize: "0.78rem", fontWeight: 700 }}>
                           💬 WA
                         </a>
+                        <button onClick={() => deleteBooking(b.id, b.name)}
+                          style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(255,45,149,0.3)", background: "rgba(255,45,149,0.08)", color: "#ff2d9588", cursor: "pointer", fontFamily: "inherit", fontSize: "0.78rem", fontWeight: 700 }}>
+                          🗑
+                        </button>
                       </div>
                     </div>
                   </div>
