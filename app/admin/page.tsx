@@ -1,5 +1,11 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
+import { BEVERAGES, SNACKS } from "@/app/components/addonsData";
+
+const ALL_ITEMS = [
+  ...BEVERAGES.map((i) => ({ ...i, category: "Beverages" })),
+  ...SNACKS.map((i) => ({ ...i, category: "Snacks" })),
+];
 
 type Payment = { razorpay_payment_id: string; amount: number; status: string; created_at: string };
 type Booking = {
@@ -47,7 +53,8 @@ export default function AdminPage() {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [dateFilter, setDateFilter] = useState("");
-  const [view, setView] = useState<"list" | "schedule">("list");
+  const [view, setView] = useState<"list" | "schedule" | "menu">("list");
+  const [menuOverrides, setMenuOverrides] = useState<Record<string, { out_of_stock?: boolean; hidden?: boolean }>>({});
   const [err, setErr] = useState("");
 
   async function login(e: React.FormEvent) {
@@ -76,6 +83,29 @@ export default function AdminPage() {
       .catch(() => { setToken(null); localStorage.removeItem("kz_admin"); })
       .finally(() => setLoading(false));
   }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+    fetch("/api/admin/menu")
+      .then((r) => r.json())
+      .then(({ overrides }) => {
+        const map: Record<string, { out_of_stock?: boolean; hidden?: boolean }> = {};
+        (overrides ?? []).forEach((o: { item_id: string; out_of_stock?: boolean; hidden?: boolean }) => { map[o.item_id] = o; });
+        setMenuOverrides(map);
+      })
+      .catch(() => {});
+  }, [token]);
+
+  async function toggleMenuField(item_id: string, field: "out_of_stock" | "hidden") {
+    const current = menuOverrides[item_id]?.[field] ?? false;
+    const value = !current;
+    setMenuOverrides((prev) => ({ ...prev, [item_id]: { ...prev[item_id], [field]: value } }));
+    await fetch("/api/admin/menu", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ item_id, field, value }),
+    });
+  }
 
   async function updateStatus(id: string, status: string) {
     await fetch("/api/admin/bookings", {
@@ -186,10 +216,10 @@ export default function AdminPage() {
 
         {/* View toggle */}
         <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
-          {(["list", "schedule"] as const).map((v) => (
+          {([["list", "📋 Bookings"], ["schedule", "📅 Schedule"], ["menu", "🍿 Menu"]] as const).map(([v, label]) => (
             <button key={v} onClick={() => setView(v)}
-              style={{ padding: "7px 16px", borderRadius: 999, border: "1px solid rgba(255,255,255,0.12)", background: view === v ? "rgba(0,247,255,0.15)" : "none", color: view === v ? "#00f7ff" : "rgba(248,251,255,0.5)", cursor: "pointer", fontFamily: "inherit", fontSize: "0.85rem", textTransform: "capitalize" }}>
-              {v === "schedule" ? "📅 Schedule" : "📋 List"}
+              style={{ padding: "7px 16px", borderRadius: 999, border: "1px solid rgba(255,255,255,0.12)", background: view === v ? "rgba(0,247,255,0.15)" : "none", color: view === v ? "#00f7ff" : "rgba(248,251,255,0.5)", cursor: "pointer", fontFamily: "inherit", fontSize: "0.85rem" }}>
+              {label}
             </button>
           ))}
         </div>
@@ -341,6 +371,60 @@ export default function AdminPage() {
               ))}
             </div>
           )
+        )}
+
+        {/* ── Menu Management view ── */}
+        {view === "menu" && (
+          <div>
+            <div style={{ fontFamily: "Rajdhani, sans-serif", fontWeight: 800, fontSize: "0.78rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "#00f7ff", marginBottom: 16 }}>
+              Menu Items — toggle stock &amp; visibility
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {ALL_ITEMS.map((item) => {
+                const oos = menuOverrides[item.id]?.out_of_stock ?? false;
+                const hidden = menuOverrides[item.id]?.hidden ?? false;
+                return (
+                  <div key={item.id} style={{
+                    display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+                    borderRadius: 14, padding: "14px 18px",
+                    background: hidden ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.07)",
+                    opacity: hidden ? 0.45 : 1,
+                    flexWrap: "wrap",
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      {item.img && <img src={item.img} alt={item.name} style={{ width: 40, height: 40, objectFit: "contain", borderRadius: 8, background: "rgba(255,255,255,0.06)" }} />}
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: "0.92rem" }}>{item.name}</div>
+                        <div style={{ fontSize: "0.76rem", color: "rgba(248,251,255,0.4)" }}>{item.category} · {item.label}</div>
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button onClick={() => toggleMenuField(item.id, "out_of_stock")}
+                        style={{
+                          padding: "6px 14px", borderRadius: 8, cursor: "pointer", fontFamily: "inherit", fontSize: "0.78rem", fontWeight: 700,
+                          border: oos ? "1px solid #f59e0b88" : "1px solid rgba(255,255,255,0.12)",
+                          background: oos ? "rgba(245,158,11,0.15)" : "rgba(255,255,255,0.04)",
+                          color: oos ? "#f59e0b" : "rgba(248,251,255,0.5)",
+                        }}>
+                        {oos ? "⚠ Out of Stock" : "✓ In Stock"}
+                      </button>
+                      <button onClick={() => toggleMenuField(item.id, "hidden")}
+                        style={{
+                          padding: "6px 14px", borderRadius: 8, cursor: "pointer", fontFamily: "inherit", fontSize: "0.78rem", fontWeight: 700,
+                          border: hidden ? "1px solid #ff2d9588" : "1px solid rgba(255,255,255,0.12)",
+                          background: hidden ? "rgba(255,45,149,0.12)" : "rgba(255,255,255,0.04)",
+                          color: hidden ? "#ff2d95" : "rgba(248,251,255,0.5)",
+                        }}>
+                        {hidden ? "👁 Hidden" : "👁 Visible"}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         )}
 
       </div>

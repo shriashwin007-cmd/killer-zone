@@ -51,7 +51,7 @@ function HoverParticles({ active }: { active: boolean }) {
   );
 }
 
-export default function AddOnCard({ item, large = false }: { item: Item; large?: boolean }) {
+export default function AddOnCard({ item, large = false, outOfStock = false }: { item: Item; large?: boolean; outOfStock?: boolean }) {
   const [hovered, setHovered] = useState(false);
   const [shaking, setShaking] = useState(false);
   const { cart, addToCart, removeItem } = useCart();
@@ -153,8 +153,16 @@ export default function AddOnCard({ item, large = false }: { item: Item; large?:
         <p style={{ color: "rgba(248,251,255,0.6)", fontSize: large ? "0.9rem" : "0.8rem", lineHeight: 1.55, flex: 1 }}>{item.desc}</p>
 
         <div className="addon-controls" style={{ display: "flex", gap: 8, alignItems: "center", marginTop: "auto" }}>
-          {inCart ? (
-            /* Trash button — removes item from cart */
+          {outOfStock ? (
+            <div style={{
+              flex: 1, minHeight: 44, borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)",
+              background: "rgba(255,255,255,0.04)", color: "rgba(248,251,255,0.3)",
+              fontWeight: 800, fontSize: "0.85rem", fontFamily: "inherit",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              Out of Stock
+            </div>
+          ) : inCart ? (
             <button
               onClick={handleRemove}
               title="Remove from cart"
@@ -175,7 +183,6 @@ export default function AddOnCard({ item, large = false }: { item: Item; large?:
               Remove
             </button>
           ) : (
-            /* Add button — adds 1 instantly */
             <button
               onClick={handleAdd}
               style={{

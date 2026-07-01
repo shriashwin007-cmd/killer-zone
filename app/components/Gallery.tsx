@@ -1,6 +1,4 @@
 "use client";
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
 
 const IMAGES = [
   {
@@ -31,16 +29,8 @@ const IMAGES = [
 ];
 
 function GalleryTile({ tile }: { tile: typeof IMAGES[0] }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const y = useTransform(scrollYProgress, [0, 1], ["-30px", "30px"]);
-
   return (
     <div
-      ref={ref}
       style={{
         borderRadius: 16,
         gridRow: tile.span ? "span 2" : undefined,
@@ -49,18 +39,16 @@ function GalleryTile({ tile }: { tile: typeof IMAGES[0] }) {
         border: "1px solid rgba(255,255,255,0.08)",
       }}
     >
-      <motion.img
+      <img
         src={tile.src}
         alt={tile.label}
         style={{
-          y,
           position: "absolute",
-          top: -40,
+          top: 0,
           left: 0,
           width: "100%",
-          height: "calc(100% + 80px)",
+          height: "100%",
           objectFit: "cover",
-          willChange: "transform",
         }}
       />
       <div style={{

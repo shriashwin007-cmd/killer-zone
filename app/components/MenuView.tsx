@@ -4,11 +4,13 @@ import { useCart } from "@/app/context/CartContext";
 import CartPanel from "@/app/components/CartPanel";
 import AddOnCard from "@/app/components/AddOnCard";
 import { CATEGORIES, type CategoryKey } from "@/app/components/addonsData";
+import { useMenuOverrides } from "@/app/lib/useMenuOverrides";
 
 export default function MenuView({ category }: { category: CategoryKey }) {
   const cat = CATEGORIES[category];
   const { totalItems, openCart } = useCart();
   const other: CategoryKey = category === "beverages" ? "snacks" : "beverages";
+  const { isHidden, isOOS } = useMenuOverrides();
 
   return (
     <main style={{ minHeight: "100svh", position: "relative", zIndex: 1 }}>
@@ -49,7 +51,9 @@ export default function MenuView({ category }: { category: CategoryKey }) {
           </div>
 
           <div className="menu-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
-            {cat.items.map((item) => <AddOnCard key={item.id} item={item} large />)}
+            {cat.items.filter((item) => !isHidden(item.id)).map((item) => (
+              <AddOnCard key={item.id} item={item} large outOfStock={isOOS(item.id)} />
+            ))}
           </div>
 
           {/* Switch category */}

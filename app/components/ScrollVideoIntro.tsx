@@ -45,9 +45,8 @@ export default function ScrollVideoIntro() {
     const PUBLIC_ID  = mobile ? MOBILE_ID : DESKTOP_ID;
     const FRAME_COUNT = mobile ? 40 : 90;
     const FRAME_W     = mobile ? 768 : 1440;
-    // mobile: reduced to 4.75 (removed 2 dead scroll heights), higher ease for smoothness
-    const multiplier  = mobile ? 4.75 : 7.7;
-    const ease        = mobile ? 0.18 : 0.12;
+    const multiplier  = mobile ? 3.8 : 7.7;
+    const ease        = mobile ? 0.32 : 0.12;
     container.style.height = `${multiplier * 100}vh`;
 
     let cancelled = false;
